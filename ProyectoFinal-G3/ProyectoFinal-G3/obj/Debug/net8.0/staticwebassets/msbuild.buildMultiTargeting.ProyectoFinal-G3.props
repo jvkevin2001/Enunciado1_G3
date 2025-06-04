@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="..\build\ProyectoFinal-G3.props" />
+</Project>
