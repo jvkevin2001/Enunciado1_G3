@@ -1,4 +1,102 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
-    Layout = "_LayoutExterno";
+    ViewData["Title"] = "Inicio";
+    Layout = "_Layout";
 }
+<!-- Hero Section con video tipo banner -->
+<div class="hero-section">
+    <video autoplay muted loop playsinline>
+        <source src="/img/Video_Infomercial_para_Ferretería.mp4" type="video/mp4">
+        Tu navegador no soporta video HTML5.
+    </video>
+</div>
+
+<style>
+    .hero-section {
+        width: 100%;
+        max-width: 800px; 
+        margin: 2rem auto 0; 
+        overflow: hidden;
+    }
+
+        .hero-section video {
+            width: 100%; 
+            height: auto; 
+            display: block; 
+            border-radius: 0; 
+        }
+</style>
+
+<!-- Sección de servicios destacados -->
+<!-- Sección de servicios destacados -->
+<div class="row mt-4">
+    <div class="col-md-4 mb-4">
+        <div class="card h-100 service-card">
+            <div class="card-body">
+                <h5 class="card-title"><i class="fas fa-tractor me-2"></i> Reparación de Tractores</h5>
+                <p class="card-text">Servicio especializado en todas las marcas y modelos.</p>
+                <a href="#" class="btn btn-sm service-btn">Más información</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-4">
+        <div class="card h-100 service-card">
+            <div class="card-body">
+                <h5 class="card-title"><i class="fas fa-tools me-2"></i> Mantenimiento Preventivo</h5>
+                <p class="card-text">Programas de mantenimiento para alargar la vida de tus equipos.</p>
+                <a href="#" class="btn btn-sm service-btn">Más información</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-4">
+        <div class="card h-100 service-card">
+            <div class="card-body">
+                <h5 class="card-title"><i class="fas fa-bolt me-2"></i> Sistemas Eléctricos</h5>
+                <p class="card-text">Diagnóstico y reparación de sistemas eléctricos agrícolas.</p>
+                <a href="#" class="btn btn-sm service-btn">Más información</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Estilos para las tarjetas de servicio */
+    .service-card {
+        background-color: #1A1A1A;
+        border: none;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        transition: all 0.3s ease;
+        border-top: 3px solid #FF6B00; /* Borde superior naranja */
+    }
+
+        .service-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+        }
+
+        .service-card .card-title {
+            color: #FF6B00; /* Título en naranja */
+            font-weight: 600;
+        }
+
+        .service-card .card-text {
+            color: #E0E0E0; /* Texto en gris claro */
+        }
+
+        .service-card i {
+            color: #FF6B00; /* Iconos en naranja */
+        }
+
+    .service-btn {
+        background-color: transparent;
+        color: #FF6B00;
+        border: 1px solid #FF6B00;
+        transition: all 0.3s ease;
+    }
+
+        .service-btn:hover {
+            background-color: #FF6B00;
+            color: #1A1A1A;
+            border-color: #FF6B00;
+        }
+</style>
