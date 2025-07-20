@@ -27,10 +27,14 @@ namespace Proyecto_API.Controllers
         {
             using (var context = new SqlConnection(_configuration.GetConnectionString("Connection")))
             {
-                var result = context.Execute("agregarReparacion",
+                var result = context.Execute("RegistrarReparacion",
                     new
                     {
-
+                        reparacion.Id_Clientes,
+                        reparacion.EquipoDescripcion,
+                        reparacion.TipoMaquina,
+                        reparacion.FechaServicio,
+                        reparacion.CostoServicio
                     });
 
                 if(result > 0)
