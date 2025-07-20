@@ -1,0 +1,43 @@
+﻿using Dapper;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
+using Proyecto_API.Models;
+using Proyecto_API.Services;
+
+namespace Proyecto_API.Controllers
+{
+    [Route("api/[controller]")]
+    [ApiController]
+    public class ReparacionesController : ControllerBase
+    {
+
+        private readonly IConfiguration _configuration;
+        private readonly IUtil _util;
+
+        public ReparacionesController(IConfiguration configuration, IUtil util)
+        {
+            _configuration = configuration;
+            _util = util;
+        }
+
+        [HttpPost]
+        [Route("agregarReparacion")]
+        public IActionResult agregarReparacion(Reparacion reparacion)
+        {
+            using (var context = new SqlConnection(_configuration.GetConnectionString("Connection")))
+            {
+                var result = context.Execute("agregarReparacion",
+                    new
+                    {
+
+                    });
+
+                if(result > 0)
+                    return Ok(_util.RespuestaExitosa(null));
+                else
+                    return BadRequest(_util.RespuestaFallida("No se pudo agregar la repacacion correctamente"));
+            }
+        }
+    }
+}
