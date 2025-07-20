@@ -12,16 +12,6 @@ namespace ProyectoFinal_G3.Controllers
             return View();
         }
 
-        [HttpGet]
-        public IActionResult Registrarse()
-        {
-            return View();
-        }
-
-        [HttpGet]
-        public IActionResult Login()
-        {
-            return View();
-        }
+ 
     }
 }

@@ -33,8 +33,17 @@
         <!-- Espacio flexible para empujar el menú de usuario a la derecha -->
         <div class="flex-grow-1"></div>
 
-        <!-- Menú de navegación derecha - Ahora siempre a la derecha -->
+        <!-- Menú de navegación derecha -->
         <ul class="navbar-nav ms-auto">
+            <!-- Enlace a Empleados -->
+            <li class="nav-item">
+                <a class="nav-link" asp-controller="Empleados" asp-action="Index">
+                    <i class="fas fa-users me-1"></i>
+                    <span class="d-none d-lg-inline">Empleados</span>
+                </a>
+            </li>
+
+            <!-- Dropdown de Cuenta -->
             <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button"
                    data-bs-toggle="dropdown" aria-expanded="false">
@@ -44,11 +53,11 @@
                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                     <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i>Configuración</a></li>
                     <li><hr class="dropdown-divider" /></li>
-                    <li><a class="dropdown-item" asp-controller="Home" asp-action="Login"><i class="fas fa-user-plus me-2"></i>Iniciar Sesión</a></li>
+                    <li><a class="dropdown-item" asp-controller="Usuario" asp-action="Login"><i class="fas fa-user-plus me-2"></i>Iniciar Sesión</a></li>
                 </ul>
             </li>
         </ul>
-    </nav>
+    </nav>wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww
 
 
     <div id="layoutSidenav">

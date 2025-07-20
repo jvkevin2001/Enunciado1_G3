@@ -1,0 +1,47 @@
+﻿@{
+    ViewData["Title"] = "Login";
+    Layout = "_LayoutExterno";
+}
+<link href="~/css/login.css" rel="stylesheet" />
+<div class="col-lg-5 mx-auto">
+    <!-- Agregué mx-auto para centrar el contenedor -->
+    <!-- Contenedor del logo con tamaño aumentado -->
+    <br />
+    <br />
+    <div class="text-center mb-4">
+        <img src="~/img/logo_sin_fondo.png" alt="Logo de la empresa"
+             style="height: 300px; width: auto; max-width: 100%; object-fit: contain;">
+    </div>
+    <br />
+    <div class="card shadow-lg border-0 rounded-lg">
+        <div class="card-header">
+            <h3 class="text-center font-weight-light my-3">Iniciar Sesión</h3> <!-- Reduje my-4 a my-3 -->
+        </div>
+        <div class="card-body">
+            <form asp-controller="Home" asp-action="Index">
+                <div class="form-floating mb-3">
+                    <input class="form-control" id="inputEmail" type="email" placeholder="name@example.com" />
+                    <label for="inputEmail">Correo</label>
+                </div>
+                <div class="form-floating mb-3">
+                    <input class="form-control" id="inputPassword" type="password" placeholder="Password" />
+                    <label for="inputPassword">Contraseña</label>
+                </div>
+
+
+                <div class="d-flex align-items-center justify-content-between mt-4 mb-0">
+                    <a class="small" asp-controller="Usuario" asp-action="Registrarse"> ¿registrarse?</a>
+                </div>
+
+
+
+
+                <div class="d-flex align-items-center justify-content-between mt-4 mb-0">
+                    <a class="small" href="password.html">¿Olvidaste tu contraseña?</a>
+                    <a class="btn btn-primary" href="index.html">Iniciar Sesión</a>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>

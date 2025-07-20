@@ -1,0 +1,136 @@
+﻿@model UsuarioViewModel
+
+@{
+    ViewData["Title"] = "Registrarse";
+    Layout = "_LayoutExterno";
+
+    if (Model.Roles == null)
+    {
+        Model.Roles = new List<Roles>();
+    }
+}
+
+<div class="col-lg-5">
+    <div class="card shadow-lg border-0 rounded-lg mt-5">
+        <br />
+        <br />
+        <div class="text-center mb-4">
+            <img src="~/img/logo_sin_fondo.png" alt="Logo de la empresa"
+                 style="height: 200px; width: auto; max-width: 100%; object-fit: contain;">
+        </div>
+        <br />
+
+        @if (ViewBag.Error != null)
+        {
+            <div class="alert alert-danger mx-3">
+                @ViewBag.Error
+            </div>
+        }
+
+        <div class="card-header"><h3 class="text-center font-weight-light my-4">Registro de Usuario</h3></div>
+        <div class="card-body">
+            <form asp-action="Registrar" method="post">
+                <div class="form-floating mb-3">
+                    <input asp-for="Usuario.Nombre_Completo" class="form-control" placeholder="Nombre Completo" required />
+                    <label>Nombre Completo</label>
+                </div>
+
+                <div class="form-floating mb-3">
+                    <input asp-for="Usuario.Correo" class="form-control" placeholder="name@example.com" required />
+                    <label>Correo Electrónico</label>
+                </div>
+
+                <div class="form-floating mb-3">
+                    <input asp-for="Usuario.Contrasenna" class="form-control" type="password" placeholder="Contraseña" required />
+                    <label>Contraseña</label>
+                </div>
+
+                <div class="form-floating mb-3">
+                    <input name="ConfirmarContrasena" class="form-control" type="password" placeholder="Confirmar Contraseña" required />
+                    <label>Confirmar Contraseña</label>
+                </div>
+
+                <div class="form-floating mb-3">
+                    <select asp-for="Usuario.Id_Rol" class="form-select" required>
+                        <option value="" selected disabled>Seleccione un rol</option>
+                        @foreach (var rol in Model.Roles)
+                        {
+                            <option value="@rol.Id_Rol">@rol.NombreRol</option>
+                        }
+                    </select>
+                    <label>Tipo de Usuario</label>
+                </div>
+
+                <div class="d-flex align-items-center justify-content-between mt-4 mb-0">
+                    <a class="small" href="@Url.Action("Login")">¿Ya tienes cuenta? Inicia sesión</a>
+                    <button type="submit" class="btn btn-primary">Registrarse</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        background-color: var(--color-fondo);
+        color: var(--color-texto);
+        border: 1px solid var(--color-secundario);
+    }
+
+    .card-header {
+        background-color: var(--color-secundario);
+        border-bottom: 1px solid var(--color-terciario);
+    }
+
+    .form-control, .form-select {
+        background-color: var(--color-terciario);
+        color: var(--color-texto);
+        border: 1px solid var(--color-secundario);
+    }
+
+        .form-control:focus, .form-select:focus {
+            background-color: var(--color-terciario);
+            color: var(--color-texto);
+            border-color: var(--color-texto);
+            box-shadow: 0 0 0 0.25rem rgba(224, 224, 224, 0.25);
+        }
+
+    .btn-primary {
+        background-color: var(--color-secundario);
+        border-color: var(--color-secundario);
+    }
+
+        .btn-primary:hover {
+            background-color: #333;
+            border-color: #333;
+        }
+
+    a {
+        color: var(--color-texto);
+    }
+
+        a:hover {
+            color: #FFF;
+        }
+
+    /* Estilo para el mensaje de error */
+    .alert-danger {
+        background-color: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+        border-radius: 4px;
+        padding: 10px;
+        margin-bottom: 15px;
+    }
+
+  .form-select {
+        background-color: var(--color-fondo); /* oscuro */
+    color: #eee;
+    border: 1px solid #555;
+}
+
+.form-select option {
+            background-color: #333;
+    color: #eee;
+}
+</style>
