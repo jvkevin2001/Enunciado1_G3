@@ -1,0 +1,51 @@
+﻿@{
+    ViewData["Title"] = "Historial de Facturas";
+}
+
+<h2 class="text-white">Historial de Facturas</h2>
+
+<form class="row g-3 mb-4">
+    <div class="col-md-3">
+        <input type="text" class="form-control bg-dark text-light border-secondary" placeholder="Nombre del cliente" name="cliente" />
+    </div>
+    <div class="col-md-3">
+        <input type="date" class="form-control bg-dark text-light border-secondary" name="fechaInicio" />
+    </div>
+    <div class="col-md-3">
+        <input type="date" class="form-control bg-dark text-light border-secondary" name="fechaFin" />
+    </div>
+    <div class="col-md-2">
+        <select class="form-select bg-dark text-light border-secondary" name="tipoFactura">
+            <option value="">Todos</option>
+            <option value="Venta">Venta</option>
+            <option value="Reparación">Reparación</option>
+        </select>
+    </div>
+    <div class="col-md-1">
+        <button type="submit" class="btn btn-outline-light w-100">Filtrar</button>
+    </div>
+</form>
+
+<table class="table table-bordered table-dark text-light">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Cliente</th>
+            <th>Fecha</th>
+            <th>Total</th>
+            <th>Tipo</th>
+            <th>Acción</th>
+        </tr>
+    </thead>
+    <tbody>
+        <!--ejemplo -->
+        <tr>
+            <td>001</td>
+            <td>Pedro Pérez</td>
+            <td>2025-07-20</td>
+            <td>₡25,000</td>
+            <td>Venta</td>
+            <td><a class="btn btn-sm btn-outline-info">Ver</a></td>
+        </tr>
+    </tbody>
+</table>
