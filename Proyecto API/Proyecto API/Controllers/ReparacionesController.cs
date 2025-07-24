@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Proyecto_API.Models;
@@ -22,25 +23,65 @@ namespace Proyecto_API.Controllers
         }
 
         [HttpPost]
-        [Route("agregarReparacion")]
-        public IActionResult agregarReparacion(Reparacion reparacion)
+        [Route("AgregarReparacion")]
+        public IActionResult agregarReparacion(Reparacion data)
         {
             using (var context = new SqlConnection(_configuration.GetConnectionString("Connection")))
             {
                 var result = context.Execute("RegistrarReparacion",
                     new
                     {
-                        reparacion.Id_Clientes,
-                        reparacion.EquipoDescripcion,
-                        reparacion.TipoMaquina,
-                        reparacion.FechaServicio,
-                        reparacion.CostoServicio
+                        data.Id_Clientes,
+                        data.EquipoDescripcion,
+                        data.TipoMaquina,
+                        data.FechaServicio,
+                        data.CostoServicio
                     });
 
                 if(result > 0)
                     return Ok(_util.RespuestaExitosa(null));
                 else
                     return BadRequest(_util.RespuestaFallida("No se pudo agregar la repacacion correctamente"));
+            }
+        }
+
+        [HttpPut]
+        [Route("AgregarProducto")]
+        public IActionResult AgregarProducto(Reparacion data)
+        {
+            using (var context = new SqlConnection(_configuration.GetConnectionString("Connection")))
+            {
+                var result = context.Execute("p_AddProductoReparacion",
+                    new
+                    {
+                        data.Id_Reparacion,
+                        data.Id_Inventario
+                    });
+
+                if (result > 0)
+                    return Ok(_util.RespuestaExitosa(null));
+                else
+                    return BadRequest(_util.RespuestaFallida("Hubo un problema al actualizar la reparacion"));
+            }
+        }
+
+        [HttpPut]
+        [Route("ActualizarEstado")]
+        public IActionResult ActualizarEstado(Reparacion data)
+        {
+            using (var context = new SqlConnection(_configuration.GetConnectionString("Connection")))
+            {
+                var result = context.Execute("p_UpdateEstadoReparacion",
+                    new
+                    {
+                        data.Id_Reparacion,
+                        data.Estado
+                    });
+
+                if (result > 0)
+                    return Ok(_util.RespuestaExitosa(null));
+                else
+                    return BadRequest(_util.RespuestaFallida("Hubo un problema al actualizar el estado de la reparacion"));
             }
         }
     }

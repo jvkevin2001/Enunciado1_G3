@@ -1,0 +1,32 @@
+﻿@model ProyectoFinal_G3.Models.Reparacion
+
+<div class="card shadow-lg border-0 rounded-lg mt-5">
+    <div class="card-header"><h3 class="text-center font-weight-light my-4">Crear Reparación</h3></div>
+    <div class="card-body">
+        <form asp-action="CrearReparacion" asp-controller="Reparacion" action="post">
+            <div class="form-floating mb-3">
+                <select asp-for="Id_Clientes" class="form-control" required>
+                    <option selected disabled>Seleccione un cliente...</option>
+                    <option>1</option>
+                    <option>1</option>
+                    <option>1</option>
+                </select>
+            </div>
+            <div class="form-floating mb-3">
+                <input asp-for="EquipoDescripcion" class="form-control" type="text" required/>
+                <label>Descripcion</label>
+            </div>
+            <div class="form-floating mb-3">
+                <input asp-for="TipoMaquina" class="form-control" type="text" required/>
+                <label>Tipo de máquina</label>
+            </div>
+            <div class="form-floating mb-3">
+                <input asp-for="CostoServicio" class="form-control" type="number" min="0" required/>
+                <label>Costo</label>
+            </div>
+            <div class="mt-4 mb-0">
+                <div class="d-grid"><input class="btn btn-primary btn-block" type="submit" value="Crear Orden"/></div>
+            </div>
+        </form>
+    </div>
+</div>
