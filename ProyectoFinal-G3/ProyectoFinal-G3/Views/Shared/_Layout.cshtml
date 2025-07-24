@@ -107,7 +107,7 @@
                             <div class="sb-nav-link-icon"><i class="fas fa-users"></i></div>
                             Clientes
                         </a>
-                        <a class="nav-link" href="#">
+                        <a class="nav-link" asp-controller="Reportes" asp-action="Analisis">
                             <div class="sb-nav-link-icon"><i class="fas fa-chart-line"></i></div>
                             Reportes
                         </a>
@@ -142,7 +142,9 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
-    <script src="~/js/scripts.js"></script>
+	<script src="~/js/scripts.js"></script>
+	<script src="~/js/facturacionventas.js"></script>
+	<script src="~/js/facturacionreparaciones.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
