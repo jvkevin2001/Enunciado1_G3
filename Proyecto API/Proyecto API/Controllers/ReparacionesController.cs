@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.Data.SqlClient;
 using Proyecto_API.Models;
 using Proyecto_API.Services;
@@ -84,5 +85,40 @@ namespace Proyecto_API.Controllers
                     return BadRequest(_util.RespuestaFallida("Hubo un problema al actualizar el estado de la reparacion"));
             }
         }
+
+        [HttpPut]
+        [Route("AgregarCostos")]
+        public IActionResult AgregarCostos(Reparacion data)
+        {
+            using (var context = new SqlConnection(_configuration.GetConnectionString("Connection")))
+            {
+                var result = context.Execute("p_UpdateCostosReparacion",
+                    new
+                    {
+                        data.Id_Reparacion,
+                        data.CostoServicio
+                    });
+
+                if (result > 0)
+                    return Ok(_util.RespuestaExitosa(null));
+                else
+                    return BadRequest(_util.RespuestaFallida("Hubo un problema al actualizar los costos de la reparacion"));
+            }
+        }
+
+        [HttpGet]
+        [Route("ObtenerReparaciones")]
+        public IActionResult ObtenerReparaciones()
+        {
+            using (var context = new SqlConnection(_configuration.GetConnectionString("Connection")))
+            {
+                var result = context.Query<Reparacion>("p_GetReparaciones");
+                if (result.Any())
+                    return Ok(_util.RespuestaExitosa(result));
+                else
+                    return BadRequest(_util.RespuestaFallida("No se encuentra ninguna reparacion"));
+            }
+        }
+
     }
 }

@@ -23,7 +23,7 @@ namespace ProyectoFinal_G3.Controllers
             using (var http = _http.CreateClient())
             {
                 http.BaseAddress = new Uri(_configuration.GetSection("Start:ApiUrl").Value!);
-                var response = http.GetAsync("api/Reparaciones/agregarReparacion").Result;
+                var response = http.GetAsync("api/Reparaciones/ObtenerClientes").Result;
             }
                 return View();
         }
