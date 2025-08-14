@@ -23,7 +23,9 @@ namespace ProyectoFinal_G3.Controllers
             using (var http = _http.CreateClient())
             {
                 http.BaseAddress = new Uri(_configuration.GetSection("Start:ApiUrl").Value!);
-                var response = http.GetAsync("api/Reparaciones/ObtenerClientes").Result;
+                var response = http.GetAsync("api/Clientes/ObtenerClientes").Result;
+                var result = response.Content.ReadFromJsonAsync<RespuestaEstandar<List<Cliente>>>().Result;
+                ViewBag.Clientes = result?.Contenido;
             }
                 return View();
         }
@@ -33,10 +35,23 @@ namespace ProyectoFinal_G3.Controllers
         {
             using (var http = _http.CreateClient())
             {
+                data.FechaServicio = DateTime.Now;
+                data.CostoServicio = 5000;
+
                 http.BaseAddress = new Uri(_configuration.GetSection("Start:ApiUrl").Value!);
-                var response = http.GetAsync("api/Reparaciones/agregarReparacion").Result;
+                var response = http.PostAsJsonAsync("api/Reparaciones/AgregarReparacion", data).Result;
+
+                if (response.IsSuccessStatusCode)
+                {
+                    return CrearReparacion();
+                }
+                else
+                {
+                    var respuesta = response.Content.ReadFromJsonAsync<RespuestaEstandar>().Result;
+                    ViewBag.Mensaje = respuesta?.Mensaje;
+                    return CrearReparacion();
+                }
             }
-            return View(data);
         }
     }
 }

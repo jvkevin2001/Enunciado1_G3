@@ -25,7 +25,7 @@ namespace Proyecto_API.Controllers
 
         [HttpPost]
         [Route("AgregarReparacion")]
-        public IActionResult agregarReparacion(Reparacion data)
+        public IActionResult AgregarReparacion(Reparacion data)
         {
             using (var context = new SqlConnection(_configuration.GetConnectionString("Connection")))
             {
