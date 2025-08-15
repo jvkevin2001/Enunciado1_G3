@@ -35,20 +35,18 @@ namespace ProyectoFinal_G3.Controllers
         {
             using (var http = _http.CreateClient())
             {
-                data.FechaServicio = DateTime.Now;
                 data.CostoServicio = 5000;
-
                 http.BaseAddress = new Uri(_configuration.GetSection("Start:ApiUrl").Value!);
                 var response = http.PostAsJsonAsync("api/Reparaciones/AgregarReparacion", data).Result;
 
                 if (response.IsSuccessStatusCode)
                 {
-                    return CrearReparacion();
+                    return RedirectToAction("CrearReparacion");
                 }
                 else
                 {
                     var respuesta = response.Content.ReadFromJsonAsync<RespuestaEstandar>().Result;
-                    ViewBag.Mensaje = respuesta?.Mensaje;
+                    TempData["Error"] = respuesta?.Mensaje;
                     return CrearReparacion();
                 }
             }

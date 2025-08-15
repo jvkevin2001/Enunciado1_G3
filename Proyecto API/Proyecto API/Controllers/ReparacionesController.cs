@@ -27,6 +27,7 @@ namespace Proyecto_API.Controllers
         [Route("AgregarReparacion")]
         public IActionResult AgregarReparacion(Reparacion data)
         {
+            data.FechaServicio = DateTime.Now;
             using (var context = new SqlConnection(_configuration.GetConnectionString("Connection")))
             {
                 var result = context.Execute("RegistrarReparacion",
@@ -42,7 +43,7 @@ namespace Proyecto_API.Controllers
                 if(result > 0)
                     return Ok(_util.RespuestaExitosa(null));
                 else
-                    return BadRequest(_util.RespuestaFallida("No se pudo agregar la repacacion correctamente"));
+                    return BadRequest(_util.RespuestaFallida("No se pudo agregar la reparacion correctamente"));
             }
         }
 
