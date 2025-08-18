@@ -1,0 +1,57 @@
+﻿@{
+    ViewData["Title"] = "Factura de Reparación";
+}
+
+<h2 class="text-white">Factura de Reparación</h2>
+
+<form>
+    <div class="mb-3">
+        <label class="form-label text-light">Cliente</label>
+        <input type="text" class="form-control bg-dark text-light border-secondary" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label text-light">Equipo Reparado</label>
+        <input type="text" class="form-control bg-dark text-light border-secondary" />
+    </div>
+
+    <h4 class="text-light">Productos Usados</h4>
+    <table class="table table-dark table-bordered text-light" id="tablaProductos">
+        <thead>
+            <tr>
+                <th>Producto</th>
+                <th>Cantidad</th>
+                <th>Precio Unitario</th>
+                <th>Subtotal</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- JS filas productos -->
+        </tbody>
+    </table>
+    <button type="button" class="btn btn-outline-light mb-3" onclick="agregarProducto()">Agregar Producto</button>
+
+    <h4 class="text-light">Servicios</h4>
+    <table class="table table-dark table-bordered text-light" id="tablaServicios">
+        <thead>
+            <tr>
+                <th>Servicio</th>
+                <th>Precio</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- JS servicios -->
+        </tbody>
+    </table>
+    <button type="button" class="btn btn-outline-light mb-3" onclick="agregarServicio()">Agregar Servicio</button>
+
+    <div class="mb-3 text-light">
+        <strong>Total:</strong> ₡<span id="totalReparacion">0.00</span>
+    </div>
+
+    <button type="submit" class="btn btn-light">Guardar Factura</button>
+</form>
+
+}
