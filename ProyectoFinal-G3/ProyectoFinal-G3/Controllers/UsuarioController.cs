@@ -75,6 +75,36 @@ namespace ProyectoFinal_G3.Controllers
             }
         }
 
+        [HttpPost]
+        public IActionResult Login(Usuario usuario)
+        {
+            usuario.Contrasenna = _encriptacionService.Encrypt(usuario.Contrasenna!);
+
+            using (var http = _http.CreateClient())
+            {
+                http.BaseAddress = new Uri(_configuration.GetSection("Start:ApiUrl").Value!);
+                var resultado = http.PostAsJsonAsync("api/Usuarios/login", usuario).Result;
+
+                if (resultado.IsSuccessStatusCode)
+                {
+                    var datos = resultado.Content.ReadFromJsonAsync<RespuestaEstandar<Usuario>>().Result;
+
+                    HttpContext.Session.SetString("IdUsuario", datos?.Contenido?.IdUsuario.ToString()!);
+                    HttpContext.Session.SetString("Nombre", datos?.Contenido?.Nombre_Completo!);
+                    HttpContext.Session.SetString("IdRol", datos?.Contenido?.Id_Rol.ToString()!);
+                    HttpContext.Session.SetString("JWT", datos?.Contenido?.Token ?? "");
+
+                    return RedirectToAction("Index", "Home");
+                }
+                else
+                {
+                    var respuesta = resultado.Content.ReadFromJsonAsync<RespuestaEstandar>().Result;
+                    ViewBag.Mensaje = respuesta?.Mensaje;
+                    return View();
+                }
+            }
+        }
+
 
 
 

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Proyecto_API.Models;
+using Proyecto_API.Services;
 using System.Data;
 namespace Proyecto_API.Controllers
 
@@ -13,10 +14,12 @@ namespace Proyecto_API.Controllers
     {
 
         private readonly IConfiguration _configuration;
+        private readonly IUtilitarios _utilitarios;
 
-        public UsuariosController(IConfiguration configuration)
+        public UsuariosController(IConfiguration configuration, IUtilitarios utilitarios)
         {
             _configuration = configuration;
+            _utilitarios = utilitarios;
         }
 
         [HttpGet]
@@ -89,6 +92,28 @@ namespace Proyecto_API.Controllers
 
 
 
+        [HttpPost]
+        [Route("login")]
+        public IActionResult login(Usuario Usuario)
+        {
+            using (var context = new SqlConnection(_configuration.GetSection("ConnectionStrings:Connection").Value))
+            {
+                var resultado = context.QueryFirstOrDefault<Usuario>("sp_login",
+                    new
+                    {
+                        Usuario.Correo,
+                        Usuario.Contrasenna
+                    });
+
+                if (resultado != null)
+                {
+                    resultado.Token = _utilitarios.GenerarToken(resultado.IdUsuario);
+                    return Ok(_utilitarios.RespuestaCorrecta(resultado));
+                }
+                else
+                    return BadRequest(_utilitarios.RespuestaIncorrecta("Su información no fue validada"));
+            }
+        }
 
 
 
