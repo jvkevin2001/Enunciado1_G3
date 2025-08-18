@@ -10,65 +10,6 @@
     }
 }
 
-<div class="col-lg-5">
-    <div class="card shadow-lg border-0 rounded-lg mt-5">
-        <br />
-        <br />
-        <div class="text-center mb-4">
-            <img src="~/img/logo_sin_fondo.png" alt="Logo de la empresa"
-                 style="height: 200px; width: auto; max-width: 100%; object-fit: contain;">
-        </div>
-        <br />
-
-        @if (ViewBag.Error != null)
-        {
-            <div class="alert alert-danger mx-3">
-                @ViewBag.Error
-            </div>
-        }
-
-        <div class="card-header"><h3 class="text-center font-weight-light my-4">Registro de Usuario</h3></div>
-        <div class="card-body">
-            <form asp-action="Registrarse" method="post">
-                <div class="form-floating mb-3">
-                    <input asp-for="Usuario.Nombre_Completo" class="form-control" placeholder="Nombre Completo" required />
-                    <label>Nombre Completo</label>
-                </div>
-
-                <div class="form-floating mb-3">
-                    <input asp-for="Usuario.Correo" class="form-control" placeholder="name@example.com" required />
-                    <label>Correo Electrónico</label>
-                </div>
-
-                <div class="form-floating mb-3">
-                    <input asp-for="Usuario.Contrasenna" class="form-control" type="password" placeholder="Contraseña" required />
-                    <label>Contraseña</label>
-                </div>
-
-                <div class="form-floating mb-3">
-                    <input name="ConfirmarContrasena" class="form-control" type="password" placeholder="Confirmar Contraseña" required />
-                    <label>Confirmar Contraseña</label>
-                </div>
-
-                <div class="form-floating mb-3">
-                    <select asp-for="Usuario.Id_Rol" class="form-select" required>
-                        <option value="" selected disabled>Seleccione un rol</option>
-                        @foreach (var rol in Model.Roles)
-                        {
-                            <option value="@rol.Id_Rol">@rol.NombreRol</option>
-                        }
-                    </select>
-                    <label>Tipo de Usuario</label>
-                </div>
-
-                <div class="d-flex align-items-center justify-content-between mt-4 mb-0">
-                    <a class="small" href="@Url.Action("Login")">¿Ya tienes cuenta? Inicia sesión</a>
-                    <button type="submit" class="btn btn-primary">Registrarse</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
 
 <style>
     .card {
@@ -123,14 +64,131 @@
         margin-bottom: 15px;
     }
 
-  .form-select {
+    .form-select {
         background-color: var(--color-fondo); /* oscuro */
-    color: #eee;
-    border: 1px solid #555;
-}
+        color: #eee;
+        border: 1px solid #555;
+    }
 
-.form-select option {
+        .form-select option {
             background-color: #333;
-    color: #eee;
-}
+            color: #eee;
+        }
 </style>
+
+<div class="col-lg-5">
+    <div class="card shadow-lg border-0 rounded-lg mt-5">
+        <br />
+        <br />
+        <div class="text-center mb-4">
+            <img src="~/img/logo_sin_fondo.png" alt="Logo de la empresa"
+                 style="height: 200px; width: auto; max-width: 100%; object-fit: contain;">
+        </div>
+        <br />
+
+        <div id="mensajeError" class="alert alert-danger mx-3" style="display:none;"></div>
+
+        <div class="card-header"><h3 class="text-center font-weight-light my-4">Registro de Usuario</h3></div>
+        <div class="card-body">
+            <form id="formRegistro">
+                <div class="form-floating mb-3">
+                    <input asp-for="Usuario.Nombre_Completo" class="form-control" placeholder="Nombre Completo" required />
+                    <label>Nombre Completo</label>
+                </div>
+
+                <div class="form-floating mb-3">
+                    <input asp-for="Usuario.Correo" class="form-control" placeholder="name@example.com" required />
+                    <label>Correo Electrónico</label>
+                </div>
+
+                <div class="form-floating mb-3">
+                    <input asp-for="Usuario.Contrasenna" class="form-control" type="password" placeholder="Contraseña" required />
+                    <label>Contraseña</label>
+                </div>
+
+                <div class="form-floating mb-3">
+                    <input name="ConfirmarContrasena" class="form-control" type="password" placeholder="Confirmar Contraseña" required />
+                    <label>Confirmar Contraseña</label>
+                </div>
+
+                <div class="form-floating mb-3">
+                    <select asp-for="Usuario.Id_Rol" class="form-select" required >
+                        <option value="" selected disabled>Seleccione un rol</option>
+                        @foreach (var rol in Model.Roles)
+                        {
+                            <option value="@rol.Id_Rol">@rol.NombreRol</option>
+                        }
+                    </select>
+                    <label>Tipo de Usuario</label>
+                </div>
+
+                <div class="d-flex align-items-center justify-content-between mt-4 mb-0">
+                    <a class="small" href="@Url.Action("Login")">¿Ya tienes cuenta? Inicia sesión</a>
+                    <button type="submit" class="btn btn-primary" id="btnRegistrar" >Registrarse</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<script>
+        $('#btnRegistrar').click(function(e) {
+        e.preventDefault(); // evita que se envíe el form normalmente
+
+        var nombre = $('#Usuario_Nombre_Completo').val().trim();
+        var correo = $('#Usuario_Correo').val().trim();
+        var contrasena = $('#Usuario_Contrasenna').val().trim();
+        var idRol = $('#Usuario_Id_Rol').val();
+
+        // Validación básica
+        if (!nombre || !correo || !contrasena || !idRol) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Campos vacíos',
+                text: 'Por favor complete todos los campos antes de registrarse.'
+            });
+            return; // sale de la función y no hace AJAX
+        }
+
+        var usuarioData = {
+            Nombre_Completo: nombre,
+            Correo: correo,
+            Contrasenna: contrasena,
+            Id_Rol: idRol
+        };
+
+        $.ajax({
+            url: '/Usuario/Registrarse',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(usuarioData),
+            success: function(response) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Éxito',
+                    text: response.message
+                }).then(() => {
+                    window.location.href = '/Home/Index';
+                });
+            },
+            error: function(xhr) {
+                let mensaje = 'Ocurrió un error o el usuario ya existe en el sistema';
+                try {
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        mensaje = xhr.responseJSON.message;
+                    } else if (xhr.responseText) {
+                        var json = JSON.parse(xhr.responseText);
+                        mensaje = json.message || mensaje;
+                    }
+                } catch (e) {}
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: mensaje
+                });
+            }
+        });
+    });
+
+</script>

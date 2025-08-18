@@ -1,4 +1,4 @@
-﻿namespace JApi.Models
+﻿namespace Proyecto_API.Models
 {
     public class RespuestaEstandar
     {

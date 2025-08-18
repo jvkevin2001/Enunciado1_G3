@@ -1,4 +1,4 @@
-﻿using JApi.Models;
+﻿using Proyecto_API.Models;
 using System.Net.Mail;
 using System.Net;
 using System.Text;
@@ -7,7 +7,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
-namespace JApi.Services
+namespace Proyecto_API.Services
 {
     public class Utilitarios : IUtilitarios
     {

@@ -54,27 +54,27 @@ namespace ProyectoFinal_G3.Controllers
 
 
         [HttpPost]
-        public IActionResult Registrarse(UsuarioViewModel model)
+        public IActionResult Registrarse([FromBody] Usuario usuario)
         {
-            model.Usuario.Contrasenna = _encriptacionService.Encrypt(model.Usuario.Contrasenna!);
+            usuario.Contrasenna = _encriptacionService.Encrypt(usuario.Contrasenna!);
 
             using (var http = _http.CreateClient())
             {
                 http.BaseAddress = new Uri(_configuration.GetSection("Start:ApiUrl").Value!);
-                var resultado = http.PostAsJsonAsync("api/Usuarios/crear_usuario", model.Usuario).Result;
+                var resultado = http.PostAsJsonAsync("api/Usuarios/crear_usuario", usuario).Result;
 
                 if (resultado.IsSuccessStatusCode)
                 {
-                    return RedirectToAction("Index", "Home");
+                    return Ok(new { message = "Usuario registrado correctamente" });
                 }
                 else
                 {
                     var respuesta = resultado.Content.ReadFromJsonAsync<RespuestaEstandar>().Result;
-                    ViewBag.Mensaje = respuesta?.Mensaje;
-                    return View();
+                    return StatusCode((int)resultado.StatusCode, new { message = respuesta?.Mensaje });
                 }
             }
         }
+
 
 
 

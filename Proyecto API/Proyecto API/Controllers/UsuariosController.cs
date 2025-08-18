@@ -47,6 +47,19 @@ namespace Proyecto_API.Controllers
         {
             using (var connection = new SqlConnection(_configuration.GetConnectionString("Connection")))
             {
+                // Verificar si ya existe un usuario con ese correo
+                var existe = connection.ExecuteScalar<int>(
+                    "SELECT COUNT(1) FROM Usuarios WHERE Correo = @Correo",
+                    new { usuario.Correo }
+                );
+
+                if (existe > 0)
+                {
+                    return Conflict(new { message = "Ya existe un usuario con este correo." });
+                    // 409 Conflict es el status más correcto
+                }
+
+                // Si no existe, procedemos a crearlo
                 var parametros = new
                 {
                     usuario.Nombre_Completo,
@@ -65,10 +78,7 @@ namespace Proyecto_API.Controllers
 
                 if (idUsuario > 0)
                 {
-                    return Ok(new
-                    {
-                        message = "Usuario creado correctamente"
-                    });
+                    return Ok(new { message = "Usuario creado correctamente" });
                 }
                 else
                 {

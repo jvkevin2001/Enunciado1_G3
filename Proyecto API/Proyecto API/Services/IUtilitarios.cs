@@ -1,7 +1,7 @@
-﻿using JApi.Models;
+﻿using Proyecto_API.Models;
 using System.Security.Claims;
 
-namespace JApi.Services
+namespace Proyecto_API.Services
 {
     public interface IUtilitarios
     {
