@@ -121,5 +121,41 @@ namespace Proyecto_API.Controllers
             }
         }
 
+        [HttpGet]
+        [Route("ObtenerReparacionesActivas")]
+        public IActionResult ObtenerReparacionesActivas()
+        {
+            using (var context = new SqlConnection(_configuration.GetConnectionString("Connection")))
+            {
+                var result = context.Query<Reparacion>("p_GetReparacionesActivas");
+                if (result.Any())
+                    return Ok(_util.RespuestaExitosa(result));
+                else
+                    return BadRequest(_util.RespuestaFallida("No se encuentra ninguna reparacion"));
+            }
+        }
+
+        [HttpGet]
+        [Route("ObtenerReparacion")]
+        public IActionResult ObtenerReparacion(int Id_Reparacion)
+        {
+            using (var context = new SqlConnection(_configuration.GetConnectionString("Connection")))
+            {
+                var result = context.QueryFirstOrDefault<Reparacion>("GetReparacion", new
+                {
+                    Id_Reparacion
+                });
+
+                if (result != null)
+                {
+                    var test = _util.RespuestaExitosa(result);
+                    return Ok(_util.RespuestaExitosa(result));
+                }
+                    
+                else
+                    return BadRequest(_util.RespuestaFallida("No se encuentra ninguna con el id " + Id_Reparacion));
+            }
+        }
+
     }
 }

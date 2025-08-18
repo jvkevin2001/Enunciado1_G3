@@ -1,0 +1,51 @@
+﻿@model ProyectoFinal_G3.Models.Reparacion
+
+<div class="card shadow-lg border-0 rounded-lg mt-5">
+    <div class="card-header">
+        <h3 class="text-center font-weight-light my-4">Reparacion @Model.Id_Reparacion</h3>
+        @if (TempData["Error"] != null)
+        {
+            <h4 style="color:red;">@TempData["Error"]</h4>
+        }
+    </div>
+
+    <div class="card-body">
+        <form asp-action="EditarReparacion" asp-controller="Reparaciones">
+            <input asp-for="Id_Reparacion" type="text" value="@Model.Id_Reparacion" hidden />
+
+            <div class="form-floating mb-3">
+                <input asp-for="Estado" class="form-control" type="text" value="@Model.Estado" disabled />
+                <label>Estado</label>
+            </div>
+            <div class="form-floating mb-3">
+                <input asp-for="Cliente" class="form-control" type="text" value="@Model.Cliente" disabled />
+                <label>Cliente</label>
+            </div>
+            <div class="form-floating mb-3">
+                <input asp-for="EquipoDescripcion" class="form-control" type="text" value="@Model.EquipoDescripcion" required />
+                <label>Descripcion</label>
+            </div>
+            <div class="form-floating mb-3">
+                <input asp-for="TipoMaquina" class="form-control" type="text" value="@Model.TipoMaquina" required />
+                <label>Tipo de máquina</label>
+            </div>
+            <div class="form-floating mb-3">
+                <input asp-for="CostoServicio" class="form-control" type="number" min="0" value="@Model.CostoServicio" required />
+                <label>Costo</label>
+            </div>
+            <div class="form-floating mb-3">
+                <select asp-for="Id_Clientes" class="form-control" required>
+                    <option selected disabled>Seleccione un producto...</option>
+                    @foreach (Inventario item in ViewBag.Inventario)
+                    {
+                        <option value="@item.Id_Inventario">@item.ProductoNombre</option>
+                    }
+                </select>
+            </div>
+            <div class="form-floating mb-3 text-center">
+                <input class="btn btn-primary btn-block" type="submit" name="botonSubmit" value="Actualizar reparacion" />
+                <input class="btn btn-primary btn-block" type="submit" name="botonSubmit" value="Finalizar reparacion" />
+            </div>
+        </form>
+    </div>
+</div>
