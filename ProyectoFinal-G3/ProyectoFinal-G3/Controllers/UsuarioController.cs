@@ -20,6 +20,12 @@ namespace ProyectoFinal_G3.Controllers
         }
 
         [HttpGet]
+        public IActionResult Login()
+        {
+            return View();
+        }
+
+        [HttpGet]
         public IActionResult Registrarse()
         {
             using (var http = _http.CreateClient())
@@ -45,29 +51,34 @@ namespace ProyectoFinal_G3.Controllers
             }
         }
 
-        [HttpGet]
-        public IActionResult Login()
+
+
+        [HttpPost]
+        public IActionResult Registrarse(UsuarioViewModel model)
         {
-            return View();
+            model.Usuario.Contrasenna = _encriptacionService.Encrypt(model.Usuario.Contrasenna!);
+
+            using (var http = _http.CreateClient())
+            {
+                http.BaseAddress = new Uri(_configuration.GetSection("Start:ApiUrl").Value!);
+                var resultado = http.PostAsJsonAsync("api/Usuarios/crear_usuario", model.Usuario).Result;
+
+                if (resultado.IsSuccessStatusCode)
+                {
+                    return RedirectToAction("Index", "Home");
+                }
+                else
+                {
+                    var respuesta = resultado.Content.ReadFromJsonAsync<RespuestaEstandar>().Result;
+                    ViewBag.Mensaje = respuesta?.Mensaje;
+                    return View();
+                }
+            }
         }
 
-        //[HttpPost]
-        //public IActionResult Login(Usuario UsuarioModel)
-        //{
-        //    UsuarioModel.Contrasenna = _encriptacionService.Encrypt(UsuarioModel.Contrasenna!);
 
 
-        //}
 
 
-        //[HttpPost]
-        //public IActionResult Registrarse(Usuario UsuarioModel)
-        //{
-        //    UsuarioModel.Contrasenna = _encriptacionService.Encrypt(UsuarioModel.Contrasenna!);
-        //    using (var http = _http.CreateClient()) {
-            
-        //    }
-
-        //}
     }
 }

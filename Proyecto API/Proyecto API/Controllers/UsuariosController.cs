@@ -1,9 +1,9 @@
-﻿using Microsoft.AspNetCore.Http;
-
+﻿using Dapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Dapper;
 using Microsoft.Data.SqlClient;
 using Proyecto_API.Models;
+using System.Data;
 namespace Proyecto_API.Controllers
 
 {
@@ -40,6 +40,53 @@ namespace Proyecto_API.Controllers
                 }
             }
         }
+
+        [HttpPost]
+        [Route("crear_usuario")]
+        public ActionResult CrearUsuario([FromBody] Usuario usuario)
+        {
+            using (var connection = new SqlConnection(_configuration.GetConnectionString("Connection")))
+            {
+                var parametros = new
+                {
+                    usuario.Nombre_Completo,
+                    usuario.Correo,
+                    usuario.Contrasenna,
+                    usuario.Estado,
+                    usuario.Token,
+                    usuario.Id_Rol
+                };
+
+                var idUsuario = connection.ExecuteScalar<int>(
+                    "sp_crear_usuario",
+                    parametros,
+                    commandType: CommandType.StoredProcedure
+                );
+
+                if (idUsuario > 0)
+                {
+                    return Ok(new
+                    {
+                        message = "Usuario creado correctamente"
+                    });
+                }
+                else
+                {
+                    return NotFound("No se pudo crear el usuario.");
+                }
+            }
+        }
+
+
+
+
+
+
+
+
+
+
+
 
     }
 }
