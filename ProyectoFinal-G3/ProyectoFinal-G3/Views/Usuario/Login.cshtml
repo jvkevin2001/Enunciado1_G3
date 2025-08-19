@@ -1,4 +1,6 @@
-﻿@{
+﻿@model ProyectoFinal_G3.Models.Usuario
+
+@{
     ViewData["Title"] = "Login";
     Layout = "_LayoutExterno";
 }
@@ -18,13 +20,14 @@
             <h3 class="text-center font-weight-light my-3">Iniciar Sesión</h3> <!-- Reduje my-4 a my-3 -->
         </div>
         <div class="card-body">
-            <form asp-controller="Home" asp-action="Index">
+            <form asp-controller="Usuario" asp-action="Login">
                 <div class="form-floating mb-3">
-                    <input class="form-control" id="inputEmail" type="email" placeholder="name@example.com" />
+                    <input asp-for="Correo"  class="form-control" id="inputEmail" type="email" placeholder="name@example.com" />
                     <label for="inputEmail">Correo</label>
                 </div>
+
                 <div class="form-floating mb-3">
-                    <input class="form-control" id="inputPassword" type="password" placeholder="Password" />
+                    <input asp-for="Contrasenna"  class="form-control" id="inputPassword" type="password" placeholder="Password" />
                     <label for="inputPassword">Contraseña</label>
                 </div>
 
@@ -36,8 +39,9 @@
 
                 <div class="d-flex align-items-center justify-content-between mt-4 mb-0">
                     <a class="small" href="password.html">¿Olvidaste tu contraseña?</a>
-                    <a class="btn btn-primary" href="index.html">Iniciar Sesión</a>
+                    <button type="submit" class="btn btn-primary">Iniciar Sesión</button>
                 </div>
+
 
             </form>
         </div>
