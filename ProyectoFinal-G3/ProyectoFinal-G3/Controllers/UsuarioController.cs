@@ -78,6 +78,9 @@ namespace ProyectoFinal_G3.Controllers
         [HttpPost]
         public IActionResult Login(Usuario usuario)
         {
+
+            var contra = usuario.Contrasenna;
+
             usuario.Contrasenna = _encriptacionService.Encrypt(usuario.Contrasenna!);
 
             using (var http = _http.CreateClient())
