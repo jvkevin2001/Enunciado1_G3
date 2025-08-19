@@ -1,0 +1,44 @@
+﻿@model IEnumerable<ProyectoFinal_G3.ViewModels.ReporteClienteViewModel>
+
+@{
+    ViewData["Title"] = "Reporte de Clientes";
+}
+
+<h1 class="mt-4">Reporte de Clientes</h1>
+<hr />
+
+<div class="mb-3">
+    <a href="@Url.Action("ExportarClientes", "Reportes", new { formato = "PDF" })" class="btn btn-danger">Exportar PDF</a>
+    <a href="@Url.Action("ExportarClientes", "Reportes", new { formato = "Excel" })" class="btn btn-success">Exportar Excel</a>
+</div>
+
+@if (Model != null && Model.Any())
+{
+    <div class="table-responsive">
+        <table class="table table-striped table-sm">
+            <thead class="table-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Correo</th>
+                    <th>Fecha Registro</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var c in Model)
+                {
+                    <tr>
+                        <td>@c.IdCliente</td>
+                        <td>@c.Nombre</td>
+                        <td>@c.Correo</td>
+                        <td>@c.FechaRegistro.ToShortDateString()</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+else
+{
+    <p>No hay clientes disponibles.</p>
+}

@@ -1,0 +1,42 @@
+﻿@model List<ProyectoFinal_G3.ViewModels.ReporteInventarioViewModel>
+
+@{
+    ViewData["Title"] = "📦 Reporte Inventario";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>📦 Reporte de Inventario</h2>
+
+<div class="mb-3">
+    <a href="@Url.Action("ExportarInventario", "Reportes", new { formato = "PDF" })" class="btn btn-danger">Exportar PDF</a>
+    <a href="@Url.Action("ExportarInventario", "Reportes", new { formato = "EXCEL" })" class="btn btn-success">Exportar Excel</a>
+</div>
+
+@if (Model != null && Model.Any())
+{
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>ID Producto</th>
+                <th>Nombre Producto</th>
+                <th>Cantidad Disponible</th>
+                <th>Precio Unitario</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.IdProducto</td>
+                    <td>@item.NombreProducto</td>
+                    <td>@item.CantidadDisponible</td>
+                    <td>@item.PrecioUnitario.ToString("C")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>No hay datos disponibles para mostrar.</p>
+}

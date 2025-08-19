@@ -1,0 +1,58 @@
+﻿@model IEnumerable<ProyectoFinal_G3.ViewModels.ReporteUsuarioViewModel>
+
+@{
+    ViewData["Title"] = "Reporte de Usuarios";
+}
+
+<h1 class="mt-4">Usuarios del Sistema</h1>
+<hr />
+
+<div class="mb-3">
+    <a href="@Url.Action("ExportarClientes", "Reportes", new { formato = "PDF" })" class="btn btn-danger">Exportar PDF</a>
+    <a href="@Url.Action("ExportarClientes", "Reportes", new { formato = "Excel" })" class="btn btn-success">Exportar Excel</a>
+</div>
+
+<div class="card mb-4">
+    <div class="card-body">
+        <form asp-action="Usuarios" method="post" class="row g-3">
+            <div class="col-md-6">
+                <label class="form-label fw-bold">Rol</label>
+                <input type="text" name="rol" class="form-control" placeholder="Ej: Administrador" />
+            </div>
+            <div class="col-md-6 d-flex align-items-end">
+                <button type="submit" class="btn btn-dark w-100">
+                    <i class="fas fa-search me-2"></i>Consultar
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@if (Model != null && Model.Any())
+{
+    <div class="table-responsive">
+        <table class="table table-bordered" id="tablaUsuarios">
+            <thead class="table-dark">
+                <tr>
+                    <th>Id</th>
+                    <th>Nombre</th>
+                    <th>Correo</th>
+                    <th>Rol</th>
+                    <th>Estado</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var u in Model)
+                {
+                    <tr>
+                        <td>@u.IdUsuario</td>
+                        <td>@u.Nombre</td>
+                        <td>@u.Correo</td>
+                        <td>@u.Rol</td>
+                        <td>@(u.Activo ? "Activo" : "Inactivo")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
