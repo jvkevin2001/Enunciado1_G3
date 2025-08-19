@@ -1,6 +1,4 @@
-﻿using System.Drawing;
-
-namespace ProyectoFinal_G3.Models
+﻿namespace ProyectoFinal_G3.Models
 {
     public class Reparacion
     {
@@ -10,9 +8,9 @@ namespace ProyectoFinal_G3.Models
         public string? EquipoDescripcion { get; set; }
         public string? TipoMaquina { get; set; }
         public DateTime FechaServicio { get; set; }
-        public DateTime FechaSalida { get; set; }
+        public DateTime? FechaSalida { get; set; }
         public decimal CostoServicio { get; set; }
-        public int Id_Inventario { get; set; }
+        public int? Id_Inventario { get; set; }
         public string? ProductoNombre { get; set; }
         public string? Estado { get; set; }
 

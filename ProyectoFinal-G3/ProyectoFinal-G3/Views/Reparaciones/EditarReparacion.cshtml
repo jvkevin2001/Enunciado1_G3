@@ -14,11 +14,11 @@
             <input asp-for="Id_Reparacion" type="text" value="@Model.Id_Reparacion" hidden />
 
             <div class="form-floating mb-3">
-                <input asp-for="Estado" class="form-control" type="text" value="@Model.Estado" disabled />
+                <input asp-for="Estado" class="form-control" type="text" value="@Model.Estado" readonly />
                 <label>Estado</label>
             </div>
             <div class="form-floating mb-3">
-                <input asp-for="Cliente" class="form-control" type="text" value="@Model.Cliente" disabled />
+                <input asp-for="Cliente" class="form-control" type="text" value="@Model.Cliente" readonly />
                 <label>Cliente</label>
             </div>
             <div class="form-floating mb-3">
@@ -30,12 +30,12 @@
                 <label>Tipo de máquina</label>
             </div>
             <div class="form-floating mb-3">
-                <input asp-for="CostoServicio" class="form-control" type="number" min="0" value="@Model.CostoServicio" required />
+                <input asp-for="CostoServicio" class="form-control" type="number" value="@Model.CostoServicio.ToString(System.Globalization.CultureInfo.InvariantCulture)" required />
                 <label>Costo</label>
             </div>
             <div class="form-floating mb-3">
-                <select asp-for="Id_Clientes" class="form-control" required>
-                    <option selected disabled>Seleccione un producto...</option>
+                <select asp-for="Id_Inventario" class="form-control">
+                    <option value="" disabled selected>Seleccione un producto...</option>
                     @foreach (Inventario item in ViewBag.Inventario)
                     {
                         <option value="@item.Id_Inventario">@item.ProductoNombre</option>

@@ -1,0 +1,41 @@
+﻿@model List<Reparacion>
+<h1 class="mt-4">Historial</h1>
+<div class="card mb-4" style="margin-top:5%">
+    <div class="card-header">
+        @if (TempData["Error"] != null)
+        {
+            <h4 style="color:red;">@TempData["Error"]</h4>
+        }
+    </div>
+    <div class="card-body">
+        <table class="table table-bordered" style="color:rgba(224,224,224);">
+            <thead>
+                <tr>
+                    <th>Id Reparación</th>
+                    <th>Cliente</th>
+                    <th>Descripción del Equipo</th>
+                    <th>Tipo de Máquina</th>
+                    <th>Fecha de Creación</th>
+                    <th>Fecha de Salida</th>
+                    <th>Costo del servicio</th>
+                    <th>Nombre del producto</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var reparacion in Model)
+                {
+                    <tr>
+                        <td>@reparacion.Id_Reparacion</td>
+                        <td>@reparacion.Cliente</td>
+                        <td>@reparacion.EquipoDescripcion</td>
+                        <td>@reparacion.TipoMaquina</td>
+                        <td>@reparacion.FechaServicio.ToString("dd/MM/yyyy")</td>
+                        <td>@reparacion.FechaSalida?.ToString("dd/MM/yyyy")</td>
+                        <td>@reparacion.CostoServicio</td>
+                        <td>@reparacion.ProductoNombre</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

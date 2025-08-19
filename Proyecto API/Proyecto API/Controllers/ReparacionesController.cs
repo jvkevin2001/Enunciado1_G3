@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.Data.SqlClient;
 using Proyecto_API.Models;
 using Proyecto_API.Services;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Proyecto_API.Controllers
 {
@@ -40,7 +41,7 @@ namespace Proyecto_API.Controllers
                         data.CostoServicio
                     });
 
-                if(result > 0)
+                if (result > 0)
                     return Ok(_util.RespuestaExitosa(null));
                 else
                     return BadRequest(_util.RespuestaFallida("No se pudo agregar la reparacion correctamente"));
@@ -48,62 +49,29 @@ namespace Proyecto_API.Controllers
         }
 
         [HttpPut]
-        [Route("AgregarProducto")]
-        public IActionResult AgregarProducto(Reparacion data)
+        [Route("FinalizarReparacion")]
+        public IActionResult FinalizarReparacion(Reparacion data)
         {
             using (var context = new SqlConnection(_configuration.GetConnectionString("Connection")))
             {
-                var result = context.Execute("p_AddProductoReparacion",
+                data.Estado = "Finalizada";
+                data.FechaSalida = DateTime.Now;
+                var result = context.Execute("p_UpdateReparacion",
                     new
                     {
                         data.Id_Reparacion,
-                        data.Id_Inventario
+                        data.Estado,
+                        data.EquipoDescripcion,
+                        data.TipoMaquina,
+                        data.CostoServicio,
+                        data.Id_Inventario,
+                        data.FechaSalida
                     });
 
                 if (result > 0)
                     return Ok(_util.RespuestaExitosa(null));
                 else
-                    return BadRequest(_util.RespuestaFallida("Hubo un problema al actualizar la reparacion"));
-            }
-        }
-
-        [HttpPut]
-        [Route("ActualizarEstado")]
-        public IActionResult ActualizarEstado(Reparacion data)
-        {
-            using (var context = new SqlConnection(_configuration.GetConnectionString("Connection")))
-            {
-                var result = context.Execute("p_UpdateEstadoReparacion",
-                    new
-                    {
-                        data.Id_Reparacion,
-                        data.Estado
-                    });
-
-                if (result > 0)
-                    return Ok(_util.RespuestaExitosa(null));
-                else
-                    return BadRequest(_util.RespuestaFallida("Hubo un problema al actualizar el estado de la reparacion"));
-            }
-        }
-
-        [HttpPut]
-        [Route("AgregarCostos")]
-        public IActionResult AgregarCostos(Reparacion data)
-        {
-            using (var context = new SqlConnection(_configuration.GetConnectionString("Connection")))
-            {
-                var result = context.Execute("p_UpdateCostosReparacion",
-                    new
-                    {
-                        data.Id_Reparacion,
-                        data.CostoServicio
-                    });
-
-                if (result > 0)
-                    return Ok(_util.RespuestaExitosa(null));
-                else
-                    return BadRequest(_util.RespuestaFallida("Hubo un problema al actualizar los costos de la reparacion"));
+                    return BadRequest(_util.RespuestaFallida("Hubo un problema al finalizar la reparacion"));
             }
         }
 
@@ -148,12 +116,39 @@ namespace Proyecto_API.Controllers
 
                 if (result != null)
                 {
-                    var test = _util.RespuestaExitosa(result);
                     return Ok(_util.RespuestaExitosa(result));
                 }
-                    
+
                 else
                     return BadRequest(_util.RespuestaFallida("No se encuentra ninguna con el id " + Id_Reparacion));
+            }
+        }
+
+        [HttpPut]
+        [Route("ActualizarReparacion")]
+        public IActionResult ActualizarReparacion(Reparacion reparacion)
+        {
+            using (var context = new SqlConnection(_configuration.GetConnectionString("Connection")))
+            {
+                reparacion.FechaSalida = null;
+                var result = context.Execute("p_UpdateReparacion", new
+                {
+                    reparacion.Id_Reparacion,
+                    reparacion.Estado,
+                    reparacion.EquipoDescripcion,
+                    reparacion.TipoMaquina,
+                    reparacion.CostoServicio,
+                    reparacion.Id_Inventario,
+                    reparacion.FechaSalida
+                });
+
+                if (result > 0)
+                {
+                    return Ok(_util.RespuestaExitosa(result));
+                }
+
+                else
+                    return BadRequest(_util.RespuestaFallida("No se pudo actualizar la reparacion numero " + reparacion.Id_Reparacion));
             }
         }
 

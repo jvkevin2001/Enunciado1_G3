@@ -71,9 +71,33 @@ namespace ProyectoFinal_G3.Controllers
                     TempData["Error"] = respuesta.Mensaje;
                     return View();
                 }
-                    
+
             }
-            
+
+        }
+
+        [HttpGet]
+        public IActionResult ReparacionesFinalizadas()
+        {
+            using (var http = _http.CreateClient())
+            {
+                http.BaseAddress = new Uri(_configuration.GetSection("Start:ApiUrl").Value!);
+                var response = http.GetAsync("api/Reparaciones/ObtenerReparaciones").Result;
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var datos = response.Content.ReadFromJsonAsync<RespuestaEstandar<List<Reparacion>>>().Result;
+                    return View(datos?.Contenido);
+                }
+                else
+                {
+                    var respuesta = response.Content.ReadFromJsonAsync<RespuestaEstandar>().Result;
+                    TempData["Error"] = respuesta.Mensaje;
+                    return View();
+                }
+
+            }
+
         }
 
         [HttpGet]
@@ -86,8 +110,8 @@ namespace ProyectoFinal_G3.Controllers
 
                 if (response.IsSuccessStatusCode)
                 {
-                    var solicitud = http.GetAsync("api/Inventario/p_GetInventario").Result;
-                    if(solicitud.IsSuccessStatusCode)
+                    var solicitud = http.GetAsync("api/Inventario/Listar").Result;
+                    if (solicitud.IsSuccessStatusCode)
                     {
                         var result = solicitud.Content.ReadFromJsonAsync<RespuestaEstandar<List<Inventario>>>().Result;
                         ViewBag.Inventario = result?.Contenido;
@@ -105,6 +129,44 @@ namespace ProyectoFinal_G3.Controllers
                     TempData["Error"] = respuesta?.Mensaje;
                     return View();
                 }
+            }
+        }
+
+        [HttpPost]
+        public IActionResult EditarReparacion(string botonSubmit, Reparacion data)
+        {
+            using (var http = _http.CreateClient())
+            {
+                http.BaseAddress = new Uri(_configuration.GetSection("Start:ApiUrl").Value!);
+                if (botonSubmit == "Actualizar reparacion")
+                {
+                    var response = http.PutAsJsonAsync("api/Reparaciones/ActualizarReparacion", data).Result;
+                    if (response.IsSuccessStatusCode)
+                    {
+                        return RedirectToAction("Reparaciones");
+                    }
+                    else
+                    {
+                        var respuesta = response.Content.ReadFromJsonAsync<RespuestaEstandar>().Result;
+                        TempData["Error"] = respuesta?.Mensaje;
+                        return EditarReparacion(data.Id_Reparacion);
+                    }
+                }
+                else if (botonSubmit == "Finalizar reparacion")
+                {
+                    var response = http.PutAsJsonAsync("api/Reparaciones/FinalizarReparacion", data).Result;
+                    if (response.IsSuccessStatusCode)
+                    {
+                        return RedirectToAction("Reparaciones");
+                    }
+                    else
+                    {
+                        var respuesta = response.Content.ReadFromJsonAsync<RespuestaEstandar>().Result;
+                        TempData["Error"] = respuesta?.Mensaje;
+                        return EditarReparacion(data.Id_Reparacion);
+                    }
+                }
+                return View();
             }
         }
     }

@@ -13,10 +13,12 @@ using Microsoft.Data.SqlClient;
 public class InventarioController : ControllerBase
 {
     private readonly string _connectionString;
+    private readonly IUtil _util;
 
-    public InventarioController(IConfiguration config)
+    public InventarioController(IConfiguration config, IUtil util)
     {
-        _connectionString = config.GetConnectionString("DefaultConnection");
+        _connectionString = config.GetConnectionString("Connection");
+        _util = util;
     }
 
     /// <summary>
@@ -35,7 +37,7 @@ public class InventarioController : ControllerBase
                     "p_GetInventario",
                     commandType: CommandType.StoredProcedure
                 );
-                return Ok(productos);
+                return Ok(_util.RespuestaExitosa(productos));
             }
         }
         catch (Exception ex)
