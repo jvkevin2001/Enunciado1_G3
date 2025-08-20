@@ -1,42 +1,47 @@
-﻿@model List<ProyectoFinal_G3.ViewModels.ReporteInventarioViewModel>
+﻿@model List<ProyectoFinal_G3.Models.Inventario>
 
-@{
-    ViewData["Title"] = "📦 Reporte Inventario";
-    Layout = "~/Views/Shared/_Layout.cshtml";
-}
+<div class="col-12">
+    <div class="card">
+        <div class="card-body">
+            <h4 class="card-title">Reporte de Inventario</h4>
+        </div>
+        <hr />
 
-<h2>📦 Reporte de Inventario</h2>
+        <div class="mb-3">
+            <a href="@Url.Action("ExportarInventarioCSV", "Reportes")" class="btn btn-success">Exportar Excel (CSV)</a>
+            <a href="@Url.Action("ExportarInventarioPDF", "Reportes")" class="btn btn-danger">Exportar PDF</a>
+        </div>
 
-<div class="mb-3">
-    <a href="@Url.Action("ExportarInventario", "Reportes", new { formato = "PDF" })" class="btn btn-danger">Exportar PDF</a>
-    <a href="@Url.Action("ExportarInventario", "Reportes", new { formato = "EXCEL" })" class="btn btn-success">Exportar Excel</a>
+        <div class="card-body">
+            <table class="table table-bordered table-hover table-dark text-white">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Producto</th>
+                        <th>Cantidad</th>
+                        <th>Descripción</th>
+                        <th>Fecha Registro</th>
+                        <th>Proveedor</th>
+                        <th>Precio Unitario</th>
+                        <th>Usuario</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var i in Model)
+                    {
+                        <tr>
+                            <td>@i.Id_Inventario</td>
+                            <td>@i.ProductoNombre</td>
+                            <td>@i.Cantidad</td>
+                            <td>@i.Descripcion</td>
+                            <td>@i.FechaRegistro.ToString("dd/MM/yyyy")</td>
+                            <td>@i.Proveedor</td>
+                            <td>@i.PrecioUnitario</td>
+                            <td>@i.Id_Usuario</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
-
-@if (Model != null && Model.Any())
-{
-    <table class="table table-bordered table-striped">
-        <thead>
-            <tr>
-                <th>ID Producto</th>
-                <th>Nombre Producto</th>
-                <th>Cantidad Disponible</th>
-                <th>Precio Unitario</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model)
-            {
-                <tr>
-                    <td>@item.IdProducto</td>
-                    <td>@item.NombreProducto</td>
-                    <td>@item.CantidadDisponible</td>
-                    <td>@item.PrecioUnitario.ToString("C")</td>
-                </tr>
-            }
-        </tbody>
-    </table>
-}
-else
-{
-    <p>No hay datos disponibles para mostrar.</p>
-}

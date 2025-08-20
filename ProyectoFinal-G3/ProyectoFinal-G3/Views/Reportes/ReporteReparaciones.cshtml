@@ -1,64 +1,78 @@
-﻿@model IEnumerable<ProyectoFinal_G3.ViewModels.ReporteReparacionViewModel>
+﻿@model List<ProyectoFinal_G3.Models.Reparacion>
 
-@{
-    ViewData["Title"] = "Reporte de Reparaciones";
-}
+<div class="col-12">
+    <div class="card">
+        <div class="card-body">
+            <h4 class="card-title">Reporte de Reparaciones</h4>
+        </div>
+        <hr />
 
-<h1 class="mt-4">Reporte de Reparaciones</h1>
-<hr />
-
-<div class="mb-3">
-    <a href="@Url.Action("ExportarClientes", "Reportes", new { formato = "PDF" })" class="btn btn-danger">Exportar PDF</a>
-    <a href="@Url.Action("ExportarClientes", "Reportes", new { formato = "Excel" })" class="btn btn-success">Exportar Excel</a>
-</div>
-
-<div class="card mb-4">
-    <div class="card-body">
-        <form asp-action="Reparaciones" method="post" class="row g-3">
-            <div class="col-md-5">
-                <label class="form-label fw-bold">Fecha Inicio</label>
-                <input type="date" name="fechaInicio" class="form-control" />
+        <form method="get" asp-controller="Reportes" asp-action="Reparaciones" class="mb-3 row">
+            <div class="col-md-4">
+                <label>Fecha Inicio</label>
+                <input type="text" class="form-control"
+                       name="fechaInicio"
+                       placeholder="dd/MM/yyyy"
+                       value="@(ViewBag.FechaInicio ?? "")" />
             </div>
-            <div class="col-md-5">
-                <label class="form-label fw-bold">Fecha Fin</label>
-                <input type="date" name="fechaFin" class="form-control" />
+            <div class="col-md-4">
+                <label>Fecha Fin</label>
+                <input type="text" class="form-control"
+                       name="fechaFin"
+                       placeholder="dd/MM/yyyy"
+                       value="@(ViewBag.FechaFin ?? "")" />
             </div>
-            <div class="col-md-2 d-flex align-items-end">
-                <button type="submit" class="btn btn-dark w-100">
-                    <i class="fas fa-search me-2"></i>Consultar
-                </button>
+            <div class="col-md-4 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary">Filtrar</button>
             </div>
         </form>
+
+        <div class="mb-3">
+            <a href="@Url.Action("ExportarReparacionesCSV", "Reportes", new { fechaInicio = ViewBag.FechaInicio, fechaFin = ViewBag.FechaFin })"
+               class="btn btn-success">Exportar Excel (CSV)</a>
+            <a href="@Url.Action("ExportarReparacionesPDF", "Reportes", new { fechaInicio = ViewBag.FechaInicio, fechaFin = ViewBag.FechaFin })"
+               class="btn btn-danger">Exportar PDF</a>
+        </div>
+
+        <div class="card-body">
+            <table class="table table-bordered table-hover table-dark text-white">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Cliente</th>
+                        <th>Equipo</th>
+                        <th>Tipo Máquina</th>
+                        <th>Fecha Servicio</th>
+                        <th>Fecha Salida</th>
+                        <th>Costo</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var r in Model)
+                        {
+                            <tr>
+                                <td>@r.Id_Reparacion</td>
+                                <td>@r.Cliente</td>
+                                <td>@r.EquipoDescripcion</td>
+                                <td>@r.TipoMaquina</td>
+                                <td>@r.FechaServicio.ToString("dd/MM/yyyy")</td>
+                                <td>@(r.FechaSalida?.ToString("dd/MM/yyyy") ?? "Pendiente")</td>
+                                <td>@r.CostoServicio.ToString("C", new System.Globalization.CultureInfo("es-CR"))</td>
+                                <td>@r.Estado</td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="8" class="text-center">No hay reparaciones en el rango de fechas seleccionado.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
-
-@if (Model != null && Model.Any())
-{
-    <div class="table-responsive">
-        <table class="table table-bordered" id="tablaReparaciones">
-            <thead class="table-dark">
-                <tr>
-                    <th>Fecha</th>
-                    <th>Cliente</th>
-                    <th>Usuario</th>
-                    <th>Servicio</th>
-                    <th>Costo</th>
-                    <th>Estado</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var r in Model)
-                {
-                    <tr>
-                        <td>@r.Fecha.ToString("yyyy-MM-dd")</td>
-                        <td>@r.Cliente</td>
-                        <td>@r.Usuario</td>
-                        <td>@r.Servicio</td>
-                        <td>₡@r.Costo.ToString("N2")</td>
-                        <td>@r.Estado</td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    </div>
-}

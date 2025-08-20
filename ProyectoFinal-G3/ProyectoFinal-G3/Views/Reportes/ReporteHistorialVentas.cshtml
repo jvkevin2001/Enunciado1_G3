@@ -1,68 +1,73 @@
-﻿@model IEnumerable<ProyectoFinal_G3.ViewModels.ReporteHistorialVentaViewModel>
+﻿@model List<ProyectoFinal_G3.Models.HistorialVentaReporte>
 
-@{
-    ViewData["Title"] = "Historial de Ventas";
-}
+<div class="col-12">
+    <div class="card">
+        <div class="card-body">
+            <h4 class="card-title">Reporte Historial de Ventas</h4>
+        </div>
+        <hr />
 
-<h1 class="mt-4">Historial de Ventas</h1>
-<hr />
-
-<div class="mb-3">
-    <a href="@Url.Action("ExportarHistorialVentas", "Reportes", new { formato = "PDF" })" class="btn btn-danger">Exportar PDF</a>
-    <a href="@Url.Action("ExportarHistorialVentas", "Reportes", new { formato = "Excel" })" class="btn btn-success">Exportar Excel</a>
-</div>
-
-<div class="card mb-4">
-    <div class="card-body">
-        <form asp-action="HistorialVentas" method="post" class="row g-3">
-            <div class="col-md-5">
-                <label class="form-label fw-bold">Fecha Inicio</label>
-                <input type="date" name="fechaInicio" class="form-control" />
+        <!-- Filtros -->
+        <form method="get" asp-controller="Reportes" asp-action="HistorialVentas" class="mb-3 row">
+            <div class="col-md-4">
+                <label>Fecha Inicio</label>
+                <input type="text" class="form-control"
+                       name="fechaInicio"
+                       placeholder="dd/MM/yyyy"
+                       value="@ViewBag.FechaInicio" />
             </div>
-            <div class="col-md-5">
-                <label class="form-label fw-bold">Fecha Fin</label>
-                <input type="date" name="fechaFin" class="form-control" />
+            <div class="col-md-4">
+                <label>Fecha Fin</label>
+                <input type="text" class="form-control"
+                       name="fechaFin"
+                       placeholder="dd/MM/yyyy"
+                       value="@ViewBag.FechaFin" />
             </div>
-            <div class="col-md-2 d-flex align-items-end">
-                <button type="submit" class="btn btn-dark w-100">
-                    <i class="fas fa-search me-2"></i>Consultar
-                </button>
+            <div class="col-md-4 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary">Filtrar</button>
             </div>
         </form>
+
+        <div class="mb-3">
+            <a href="@Url.Action("ExportarHistorialVentasCSV", "Reportes", new { fechaInicio = ViewBag.FechaInicio, fechaFin = ViewBag.FechaFin })"
+               class="btn btn-success">Exportar Excel (CSV)</a>
+            <a href="@Url.Action("ExportarHistorialVentasPDF", "Reportes", new { fechaInicio = ViewBag.FechaInicio, fechaFin = ViewBag.FechaFin })"
+               class="btn btn-danger">Exportar PDF</a>
+        </div>
+
+        <div class="card-body">
+            <table class="table table-bordered table-hover table-dark text-white">
+                <thead>
+                    <tr>
+                        <th>ID Venta</th>
+                        <th>Cliente</th>
+                        <th>Usuario</th>
+                        <th>Fecha Venta</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var v in Model)
+                        {
+                            <tr>
+                                <td>@v.Id_Venta</td>
+                                <td>@v.Cliente</td>
+                                <td>@v.Usuario</td>
+                                <td>@v.FechaVenta.ToString("dd/MM/yyyy")</td>
+                                <td>@v.TotalVenta.ToString("C", new System.Globalization.CultureInfo("es-CR"))</td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="5" class="text-center">No hay ventas en el rango de fechas seleccionado.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
-
-@if (Model != null && Model.Any())
-{
-    <div class="table-responsive">
-        <table class="table table-bordered table-striped">
-            <thead class="table-dark">
-                <tr>
-                    <th>Fecha</th>
-                    <th>Cliente</th>
-                    <th>Inventario</th>
-                    <th>Cantidad</th>
-                    <th>Precio línea</th>
-                    <th>Total venta</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var h in Model)
-                {
-                    <tr>
-                        <td>@h.Fecha.ToString("yyyy-MM-dd")</td>
-                        <td>@h.NombreCliente</td>
-                        <td>@h.Id_Inventario</td>
-                        <td class="text-end">@h.Cantidad</td>
-                        <td class="text-end">₡@h.PrecioLinea.ToString("N2")</td>
-                        <td class="text-end fw-semibold">₡@h.TotalVentaFactura.ToString("N2")</td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    </div>
-}
-else
-{
-    <p>No hay resultados para el rango seleccionado.</p>
-}

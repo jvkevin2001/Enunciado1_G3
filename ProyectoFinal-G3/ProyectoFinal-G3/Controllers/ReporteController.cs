@@ -1,6 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using ProyectoFinal_G3.ViewModels;
+﻿using System.Globalization;
 using System.Text.Json;
+using Microsoft.AspNetCore.Mvc;
+using ProyectoFinal_G3.Models;
 
 namespace ProyectoFinal_G3.Controllers
 {
@@ -21,162 +22,452 @@ namespace ProyectoFinal_G3.Controllers
             using var cliente = _http.CreateClient();
             cliente.BaseAddress = new Uri(_configuration.GetSection("Start:ApiUrl").Value!);
 
-            var resp = await cliente.GetAsync("api/reportes/clientes");
+            var resp = await cliente.GetAsync("api/Reportes/Clientes");
             if (!resp.IsSuccessStatusCode)
             {
-                ViewBag.Error = $"API respondió {(int)resp.StatusCode}";
-                return View("ReporteClientes", new List<ReporteClienteViewModel>());
+                ViewBag.Mensaje = "No se pudieron cargar los clientes";
+                return View("ReporteClientes", new List<Cliente>());
             }
 
-            var json = await resp.Content.ReadAsStringAsync();
-            var data = JsonSerializer.Deserialize<List<ReporteClienteViewModel>>(json, _jsonOptions);
-            return View("ReporteClientes", data ?? new List<ReporteClienteViewModel>());
+            var datos = await resp.Content.ReadFromJsonAsync<RespuestaEstandar<List<Cliente>>>();
+            return View("ReporteClientes", datos?.Contenido ?? new List<Cliente>());
         }
 
-        [HttpPost]
-        public async Task<IActionResult> Clientes(DateTime? fechaInicio, DateTime? fechaFin)
+        [HttpGet]
+        public async Task<IActionResult> ExportarClientesCSV()
         {
             using var cliente = _http.CreateClient();
             cliente.BaseAddress = new Uri(_configuration.GetSection("Start:ApiUrl").Value!);
 
-            string url = "api/reportes/clientes";
-            if (fechaInicio.HasValue && fechaFin.HasValue)
-                url += $"?fechaInicio={fechaInicio:yyyy-MM-dd}&fechaFin={fechaFin:yyyy-MM-dd}";
+            var resp = await cliente.GetAsync("api/Reportes/Clientes");
+            if (!resp.IsSuccessStatusCode)
+                return BadRequest("No se pudo obtener la información");
 
-            try
-            {
-                var response = await cliente.GetAsync(url);
-                if (response.IsSuccessStatusCode)
-                {
-                    var json = await response.Content.ReadAsStringAsync();
-                    var data = JsonSerializer.Deserialize<List<ReporteClienteViewModel>>(json, _jsonOptions);
-                    return View("ReporteClientes", data ?? new List<ReporteClienteViewModel>());
-                }
+            var datos = await resp.Content.ReadFromJsonAsync<RespuestaEstandar<List<Cliente>>>();
+            var clientes = datos?.Contenido ?? new List<Cliente>();
 
-                ViewBag.Error = "No se pudieron obtener los clientes.";
-                return View("ReporteClientes", new List<ReporteClienteViewModel>());
-            }
-            catch (Exception ex)
-            {
-                ViewBag.Error = $"Error al conectar con la API: {ex.Message}";
-                return View("ReporteClientes", new List<ReporteClienteViewModel>());
-            }
+            var sb = new System.Text.StringBuilder();
+            sb.AppendLine("ID,Nombre,Correo,Telefono");
+
+            foreach (var c in clientes)
+                sb.AppendLine($"{c.Id_Clientes},{c.NombreCliente},{c.Correo},{c.Telefono}");
+
+            var bytes = System.Text.Encoding.UTF8.GetBytes(sb.ToString());
+            return File(bytes, "text/csv", "ReporteClientes.csv");
         }
+
+
+        [HttpGet]
+        public async Task<IActionResult> ExportarClientesPDF()
+        {
+            using var cliente = _http.CreateClient();
+            cliente.BaseAddress = new Uri(_configuration.GetSection("Start:ApiUrl").Value!);
+
+            var resp = await cliente.GetAsync("api/Reportes/Clientes");
+            if (!resp.IsSuccessStatusCode)
+                return BadRequest("No se pudo obtener la información");
+
+            var datos = await resp.Content.ReadFromJsonAsync<RespuestaEstandar<List<Cliente>>>();
+            var clientes = datos?.Contenido ?? new List<Cliente>();
+
+            var sb = new System.Text.StringBuilder();
+            sb.AppendLine("<html><head><meta charset='UTF-8'></head><body>");
+            sb.AppendLine("<h2>Reporte de Clientes</h2>");
+            sb.AppendLine("<table border='1' cellpadding='5' cellspacing='0'>");
+            sb.AppendLine("<tr><th>ID</th><th>Nombre</th><th>Correo</th><th>Teléfono</th></tr>");
+
+            foreach (var c in clientes)
+            {
+                sb.AppendLine($"<tr><td>{c.Id_Clientes}</td><td>{c.NombreCliente}</td><td>{c.Correo}</td><td>{c.Telefono}</td></tr>");
+            }
+
+            sb.AppendLine("</table></body></html>");
+
+            return Content(sb.ToString(), "text/html");
+        }
+
 
         // HISTORIAL VENTAS
         [HttpGet]
-        public IActionResult HistorialVentas()
+        public async Task<IActionResult> HistorialVentas(string fechaInicio, string fechaFin)
         {
-            return View("ReporteHistorialVentas", new List<ReporteHistorialVentaViewModel>());
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> HistorialVentas(DateTime? fechaInicio, DateTime? fechaFin, int? idCliente, int? idUsuario)
-        {
-            var cliente = _http.CreateClient();
+            using var cliente = _http.CreateClient();
             cliente.BaseAddress = new Uri(_configuration.GetSection("Start:ApiUrl").Value!);
 
-            var url = "api/reportes/ventas";
-            var qs = new List<string>();
-            if (fechaInicio.HasValue) qs.Add($"fechaInicio={fechaInicio:yyyy-MM-dd}");
-            if (fechaFin.HasValue) qs.Add($"fechaFin={fechaFin:yyyy-MM-dd}");
-            if (idCliente.HasValue) qs.Add($"idCliente={idCliente}");
-            if (idUsuario.HasValue) qs.Add($"idUsuario={idUsuario}");
-            if (qs.Count > 0) url += "?" + string.Join("&", qs);
+            var url = "api/Reportes/HistorialVentas";
 
-            var response = await cliente.GetAsync(url);
-            if (response.IsSuccessStatusCode)
+            if (!string.IsNullOrEmpty(fechaInicio) && !string.IsNullOrEmpty(fechaFin))
             {
-                var json = await response.Content.ReadAsStringAsync();
-                var data = JsonSerializer.Deserialize<List<ReporteHistorialVentaViewModel>>(json, _jsonOptions);
-                return View("ReporteHistorialVentas", data ?? new List<ReporteHistorialVentaViewModel>());
+                var inicio = DateTime.ParseExact(fechaInicio, "dd/MM/yyyy", CultureInfo.InvariantCulture);
+                var fin = DateTime.ParseExact(fechaFin, "dd/MM/yyyy", CultureInfo.InvariantCulture);
+
+                url += $"?fechaInicio={inicio:yyyy-MM-dd}&fechaFin={fin:yyyy-MM-dd}";
             }
 
-            ViewBag.Error = "No se encontraron ventas en el rango seleccionado.";
-            return View("ReporteHistorialVentas", new List<ReporteHistorialVentaViewModel>());
+            var resp = await cliente.GetAsync(url);
+
+            if (!resp.IsSuccessStatusCode)
+            {
+                ViewBag.Mensaje = "No se pudieron cargar las ventas";
+                return View("ReporteHistorialVentas", new List<HistorialVentaReporte>());
+            }
+
+            var datos = await resp.Content.ReadFromJsonAsync<RespuestaEstandar<List<HistorialVentaReporte>>>();
+
+            ViewBag.FechaInicio = fechaInicio;
+            ViewBag.FechaFin = fechaFin;
+
+            return View("ReporteHistorialVentas", datos?.Contenido ?? new List<HistorialVentaReporte>());
         }
+
+        [HttpGet]
+        public async Task<IActionResult> ExportarHistorialVentasCSV(string fechaInicio, string fechaFin)
+        {
+            using var http = _http.CreateClient();
+            http.BaseAddress = new Uri(_configuration.GetSection("Start:ApiUrl").Value!);
+
+            var url = "api/Reportes/HistorialVentas";
+
+            if (!string.IsNullOrEmpty(fechaInicio) && !string.IsNullOrEmpty(fechaFin))
+            {
+                var inicio = DateTime.ParseExact(fechaInicio, "dd/MM/yyyy", CultureInfo.InvariantCulture);
+                var fin = DateTime.ParseExact(fechaFin, "dd/MM/yyyy", CultureInfo.InvariantCulture);
+
+                url += $"?fechaInicio={inicio:yyyy-MM-dd}&fechaFin={fin:yyyy-MM-dd}";
+            }
+
+            var response = await http.GetAsync(url);
+            if (!response.IsSuccessStatusCode)
+                return BadRequest("No se pudo obtener la información");
+
+            var datos = await response.Content.ReadFromJsonAsync<RespuestaEstandar<List<HistorialVentaReporte>>>();
+            var ventas = datos?.Contenido ?? new List<HistorialVentaReporte>();
+
+            var sb = new System.Text.StringBuilder();
+            sb.AppendLine("ID Venta,Cliente,Usuario,Fecha Venta,Total");
+
+            foreach (var v in ventas)
+            {
+                sb.AppendLine($"{v.Id_Venta},{v.Cliente},{v.Usuario},{v.FechaVenta:dd/MM/yyyy},{v.TotalVenta}");
+            }
+
+            var bytes = System.Text.Encoding.UTF8.GetBytes(sb.ToString());
+            return File(bytes, "text/csv", "HistorialVentas.csv");
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> ExportarHistorialVentasPDF(string fechaInicio, string fechaFin)
+        {
+            using var http = _http.CreateClient();
+            http.BaseAddress = new Uri(_configuration.GetSection("Start:ApiUrl").Value!);
+
+            var url = "api/Reportes/HistorialVentas";
+
+            if (!string.IsNullOrEmpty(fechaInicio) && !string.IsNullOrEmpty(fechaFin))
+            {
+                var inicio = DateTime.ParseExact(fechaInicio, "dd/MM/yyyy", CultureInfo.InvariantCulture);
+                var fin = DateTime.ParseExact(fechaFin, "dd/MM/yyyy", CultureInfo.InvariantCulture);
+
+                url += $"?fechaInicio={inicio:yyyy-MM-dd}&fechaFin={fin:yyyy-MM-dd}";
+            }
+
+            var response = await http.GetAsync(url);
+            if (!response.IsSuccessStatusCode)
+                return BadRequest("No se pudo obtener la información");
+
+            var datos = await response.Content.ReadFromJsonAsync<RespuestaEstandar<List<HistorialVentaReporte>>>();
+            var ventas = datos?.Contenido ?? new List<HistorialVentaReporte>();
+
+            var sb = new System.Text.StringBuilder();
+            sb.AppendLine("<html><head><meta charset='UTF-8'></head><body>");
+            sb.AppendLine("<h2>Historial de Ventas</h2>");
+            sb.AppendLine("<table border='1' cellpadding='5' cellspacing='0'>");
+            sb.AppendLine("<tr><th>ID Venta</th><th>Cliente</th><th>Usuario</th><th>Fecha Venta</th><th>Total</th></tr>");
+
+            foreach (var v in ventas)
+            {
+                sb.AppendLine($"<tr>" +
+                              $"<td>{v.Id_Venta}</td>" +
+                              $"<td>{v.Cliente}</td>" +
+                              $"<td>{v.Usuario}</td>" +
+                              $"<td>{v.FechaVenta:dd/MM/yyyy}</td>" +
+                              $"<td>{v.TotalVenta:C}</td>" +
+                              $"</tr>");
+            }
+
+            sb.AppendLine("</table></body></html>");
+
+            return Content(sb.ToString(), "text/html");
+        }
+
+
+
 
         // INVENTARIO
         [HttpGet]
-        public IActionResult Inventario()
+        public async Task<IActionResult> Inventario()
         {
-            return View("ReporteInventario", new List<ReporteInventarioViewModel>());
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> Inventario(DateTime? fecha)
-        {
-            var cliente = _http.CreateClient();
+            using var cliente = _http.CreateClient();
             cliente.BaseAddress = new Uri(_configuration.GetSection("Start:ApiUrl").Value!);
 
-            var response = await cliente.GetAsync("api/reportes/inventario");
-
-            if (response.IsSuccessStatusCode)
+            var resp = await cliente.GetAsync("api/Reportes/Inventario");
+            if (!resp.IsSuccessStatusCode)
             {
-                var json = await response.Content.ReadAsStringAsync();
-                var data = JsonSerializer.Deserialize<List<ReporteInventarioViewModel>>(json, _jsonOptions);
-                return View("ReporteInventario", data ?? new List<ReporteInventarioViewModel>());
+                ViewBag.Mensaje = "No se pudieron cargar los registros de inventario";
+                return View("ReporteInventario", new List<Inventario>());
             }
 
-            ViewBag.Error = "No se pudo obtener el inventario.";
-            return View("ReporteInventario", new List<ReporteInventarioViewModel>());
+            var datos = await resp.Content.ReadFromJsonAsync<RespuestaEstandar<List<Inventario>>>();
+            return View("ReporteInventario", datos?.Contenido ?? new List<Inventario>());
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> ExportarInventarioCSV()
+        {
+            using var cliente = _http.CreateClient();
+            cliente.BaseAddress = new Uri(_configuration.GetSection("Start:ApiUrl").Value!);
+
+            var resp = await cliente.GetAsync("api/Reportes/Inventario");
+            if (!resp.IsSuccessStatusCode)
+                return BadRequest("No se pudo obtener la información");
+
+            var datos = await resp.Content.ReadFromJsonAsync<RespuestaEstandar<List<Inventario>>>();
+            var inventario = datos?.Contenido ?? new List<Inventario>();
+
+            var sb = new System.Text.StringBuilder();
+            sb.AppendLine("Id_Inventario,ProductoNombre,Cantidad,Descripcion,FechaRegistro,Proveedor,PrecioUnitario,Id_Usuario");
+
+            foreach (var i in inventario)
+            {
+                sb.AppendLine($"{i.Id_Inventario},{i.ProductoNombre},{i.Cantidad},{i.Descripcion},{i.FechaRegistro:dd/MM/yyyy},{i.Proveedor},{i.PrecioUnitario},{i.Id_Usuario}");
+            }
+
+            var bytes = System.Text.Encoding.UTF8.GetBytes(sb.ToString());
+            return File(bytes, "text/csv", "ReporteInventario.csv");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ExportarInventarioPDF()
+        {
+            using var cliente = _http.CreateClient();
+            cliente.BaseAddress = new Uri(_configuration.GetSection("Start:ApiUrl").Value!);
+
+            var resp = await cliente.GetAsync("api/Reportes/Inventario");
+            if (!resp.IsSuccessStatusCode)
+                return BadRequest("No se pudo obtener la información");
+
+            var datos = await resp.Content.ReadFromJsonAsync<RespuestaEstandar<List<Inventario>>>();
+            var inventario = datos?.Contenido ?? new List<Inventario>();
+
+            var sb = new System.Text.StringBuilder();
+            sb.AppendLine("<html><head><meta charset='UTF-8'></head><body>");
+            sb.AppendLine("<h2>Reporte de Inventario</h2>");
+            sb.AppendLine("<table border='1' cellpadding='5' cellspacing='0'>");
+            sb.AppendLine("<tr><th>ID</th><th>Producto</th><th>Cantidad</th><th>Descripción</th><th>Fecha Registro</th><th>Proveedor</th><th>Precio Unitario</th><th>Usuario</th></tr>");
+
+            foreach (var i in inventario)
+            {
+                sb.AppendLine($"<tr><td>{i.Id_Inventario}</td><td>{i.ProductoNombre}</td><td>{i.Cantidad}</td><td>{i.Descripcion}</td><td>{i.FechaRegistro:dd/MM/yyyy}</td><td>{i.Proveedor}</td><td>{i.PrecioUnitario}</td><td>{i.Id_Usuario}</td></tr>");
+            }
+
+            sb.AppendLine("</table></body></html>");
+
+            return Content(sb.ToString(), "text/html");
         }
 
         // REPARACIONES
         [HttpGet]
-        public IActionResult Reparaciones()
+        public async Task<IActionResult> Reparaciones(string fechaInicio, string fechaFin)
         {
-            return View("ReporteReparaciones", new List<ReporteReparacionViewModel>());
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> Reparaciones(DateTime fechaInicio, DateTime fechaFin)
-        {
-            var cliente = _http.CreateClient();
+            using var cliente = _http.CreateClient();
             cliente.BaseAddress = new Uri(_configuration.GetSection("Start:ApiUrl").Value!);
 
-            var response = await cliente.GetAsync(
-                $"api/reportes/reparaciones?fechaInicio={fechaInicio:yyyy-MM-dd}&fechaFin={fechaFin:yyyy-MM-dd}");
+            var url = "api/Reportes/Reparaciones";
 
-            if (response.IsSuccessStatusCode)
+            if (!string.IsNullOrEmpty(fechaInicio) && !string.IsNullOrEmpty(fechaFin))
             {
-                var json = await response.Content.ReadAsStringAsync();
-                var data = JsonSerializer.Deserialize<List<ReporteReparacionViewModel>>(json, _jsonOptions);
-                return View("ReporteReparaciones", data ?? new List<ReporteReparacionViewModel>());
+                var inicio = DateTime.ParseExact(fechaInicio, "dd/MM/yyyy", CultureInfo.InvariantCulture);
+                var fin = DateTime.ParseExact(fechaFin, "dd/MM/yyyy", CultureInfo.InvariantCulture);
+
+                url += $"?fechaInicio={inicio:yyyy-MM-dd}&fechaFin={fin:yyyy-MM-dd}";
             }
 
-            ViewBag.Error = "No se encontraron reparaciones en el rango de fechas.";
-            return View("ReporteReparaciones", new List<ReporteReparacionViewModel>());
+            var resp = await cliente.GetAsync(url);
+            if (!resp.IsSuccessStatusCode)
+            {
+                ViewBag.Mensaje = "No se pudieron cargar las reparaciones";
+                return View("ReporteReparaciones", new List<Reparacion>());
+            }
+
+            var datos = await resp.Content.ReadFromJsonAsync<RespuestaEstandar<List<Reparacion>>>();
+            ViewBag.FechaInicio = fechaInicio;
+            ViewBag.FechaFin = fechaFin;
+
+            return View("ReporteReparaciones", datos?.Contenido ?? new List<Reparacion>());
         }
+
+        [HttpGet]
+        public async Task<IActionResult> ExportarReparacionesCSV(string fechaInicio, string fechaFin)
+        {
+            using var http = _http.CreateClient();
+            http.BaseAddress = new Uri(_configuration.GetSection("Start:ApiUrl").Value!);
+
+            var url = "api/Reportes/Reparaciones";
+            if (!string.IsNullOrEmpty(fechaInicio) && !string.IsNullOrEmpty(fechaFin))
+            {
+                var fi = DateTime.ParseExact(fechaInicio, "dd/MM/yyyy", CultureInfo.InvariantCulture);
+                var ff = DateTime.ParseExact(fechaFin, "dd/MM/yyyy", CultureInfo.InvariantCulture);
+                url += $"?fechaInicio={fi:yyyy-MM-dd}&fechaFin={ff:yyyy-MM-dd}";
+            }
+
+            var response = await http.GetAsync(url);
+
+            if (!response.IsSuccessStatusCode)
+                return BadRequest("No se pudo obtener la información");
+
+            var datos = await response.Content.ReadFromJsonAsync<RespuestaEstandar<List<Reparacion>>>();
+            var reparaciones = datos?.Contenido ?? new List<Reparacion>();
+
+            var sb = new System.Text.StringBuilder();
+            sb.AppendLine("ID,Cliente,Equipo,Tipo,FechaServicio,FechaSalida,Costo,Estado");
+
+            foreach (var r in reparaciones)
+            {
+                sb.AppendLine($"{r.Id_Reparacion},{r.Cliente},{r.EquipoDescripcion},{r.TipoMaquina}," +
+                              $"{r.FechaServicio:dd/MM/yyyy},{(r.FechaSalida.HasValue ? r.FechaSalida.Value.ToString("dd/MM/yyyy") : "")}," +
+                              $"{r.CostoServicio},{r.Estado}");
+            }
+
+            var bytes = System.Text.Encoding.UTF8.GetBytes(sb.ToString());
+            return File(bytes, "text/csv", "ReporteReparaciones.csv");
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> ExportarReparacionesPDF(string fechaInicio, string fechaFin)
+        {
+            using var http = _http.CreateClient();
+            http.BaseAddress = new Uri(_configuration.GetSection("Start:ApiUrl").Value!);
+
+            var url = "api/Reportes/Reparaciones";
+            if (!string.IsNullOrEmpty(fechaInicio) && !string.IsNullOrEmpty(fechaFin))
+            {
+                var fi = DateTime.ParseExact(fechaInicio, "dd/MM/yyyy", CultureInfo.InvariantCulture);
+                var ff = DateTime.ParseExact(fechaFin, "dd/MM/yyyy", CultureInfo.InvariantCulture);
+                url += $"?fechaInicio={fi:yyyy-MM-dd}&fechaFin={ff:yyyy-MM-dd}";
+            }
+
+            var response = await http.GetAsync(url);
+
+            if (!response.IsSuccessStatusCode)
+                return BadRequest("No se pudo obtener la información");
+
+            var datos = await response.Content.ReadFromJsonAsync<RespuestaEstandar<List<Reparacion>>>();
+            var reparaciones = datos?.Contenido ?? new List<Reparacion>();
+
+            var sb = new System.Text.StringBuilder();
+            sb.AppendLine("<html><head><meta charset='UTF-8'></head><body>");
+            sb.AppendLine("<h2>Reporte de Reparaciones</h2>");
+            sb.AppendLine("<table border='1' cellpadding='5' cellspacing='0'>");
+            sb.AppendLine("<tr><th>ID</th><th>Cliente</th><th>Equipo</th><th>Tipo</th><th>Fecha Servicio</th><th>Fecha Salida</th><th>Costo</th><th>Estado</th></tr>");
+
+            foreach (var r in reparaciones)
+            {
+                sb.AppendLine($"<tr>" +
+                              $"<td>{r.Id_Reparacion}</td>" +
+                              $"<td>{r.Cliente}</td>" +
+                              $"<td>{r.EquipoDescripcion}</td>" +
+                              $"<td>{r.TipoMaquina}</td>" +
+                              $"<td>{r.FechaServicio:dd/MM/yyyy}</td>" +
+                              $"<td>{(r.FechaSalida.HasValue ? r.FechaSalida.Value.ToString("dd/MM/yyyy") : "")}</td>" +
+                              $"<td>{r.CostoServicio:C}</td>" +
+                              $"<td>{r.Estado}</td>" +
+                              $"</tr>");
+            }
+
+            sb.AppendLine("</table></body></html>");
+
+            return Content(sb.ToString(), "text/html");
+        }
+
+
 
         // USUARIOS
         [HttpGet]
-        public IActionResult Usuarios()
+        public async Task<IActionResult> Usuarios()
         {
-            return View("ReporteUsuarios", new List<ReporteUsuarioViewModel>());
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> Usuarios(string rol = "")
-        {
-            var cliente = _http.CreateClient();
+            using var cliente = _http.CreateClient();
             cliente.BaseAddress = new Uri(_configuration.GetSection("Start:ApiUrl").Value!);
 
-            var url = "api/reportes/usuarios";
-            if (!string.IsNullOrEmpty(rol))
-                url += $"?rol={rol}";
-
-            var response = await cliente.GetAsync(url);
-
-            if (response.IsSuccessStatusCode)
+            var resp = await cliente.GetAsync("api/Reportes/Usuarios");
+            if (!resp.IsSuccessStatusCode)
             {
-                var json = await response.Content.ReadAsStringAsync();
-                var data = JsonSerializer.Deserialize<List<ReporteUsuarioViewModel>>(json, _jsonOptions);
-                return View("ReporteUsuarios", data ?? new List<ReporteUsuarioViewModel>());
+                ViewBag.Mensaje = "No se pudieron cargar los usuarios";
+                return View("ReporteUsuarios", new List<Usuario>()); // 👈 aquí el nombre real de la vista
             }
 
-            ViewBag.Error = "No se pudieron obtener los usuarios.";
-            return View("ReporteUsuarios", new List<ReporteUsuarioViewModel>());
+            var datos = await resp.Content.ReadFromJsonAsync<RespuestaEstandar<List<Usuario>>>();
+            return View("ReporteUsuarios", datos?.Contenido ?? new List<Usuario>()); // 👈 aquí también
         }
+
+        [HttpGet]
+        public async Task<IActionResult> ExportarUsuariosCSV()
+        {
+            using var cliente = _http.CreateClient();
+            cliente.BaseAddress = new Uri(_configuration.GetSection("Start:ApiUrl").Value!);
+
+            var resp = await cliente.GetAsync("api/Reportes/Usuarios");
+            if (!resp.IsSuccessStatusCode)
+                return BadRequest("No se pudo obtener la información");
+
+            var datos = await resp.Content.ReadFromJsonAsync<RespuestaEstandar<List<Usuario>>>();
+            var usuarios = datos?.Contenido ?? new List<Usuario>();
+
+            var sb = new System.Text.StringBuilder();
+            sb.AppendLine("IdUsuario,Nombre_Completo,Correo,Id_Rol,Estado");
+
+            foreach (var u in usuarios)
+            {
+                sb.AppendLine($"{u.IdUsuario},{u.Nombre_Completo},{u.Correo},{u.Id_Rol},{(u.Estado ? "Activo" : "Inactivo")}");
+            }
+
+            var bytes = System.Text.Encoding.UTF8.GetBytes(sb.ToString());
+            return File(bytes, "text/csv", "ReporteUsuarios.csv");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ExportarUsuariosPDF()
+        {
+            using var cliente = _http.CreateClient();
+            cliente.BaseAddress = new Uri(_configuration.GetSection("Start:ApiUrl").Value!);
+
+            var resp = await cliente.GetAsync("api/Reportes/Usuarios");
+            if (!resp.IsSuccessStatusCode)
+                return BadRequest("No se pudo obtener la información");
+
+            var datos = await resp.Content.ReadFromJsonAsync<RespuestaEstandar<List<Usuario>>>();
+            var usuarios = datos?.Contenido ?? new List<Usuario>();
+
+            var sb = new System.Text.StringBuilder();
+            sb.AppendLine("<html><head><meta charset='UTF-8'></head><body>");
+            sb.AppendLine("<h2>Reporte de Usuarios</h2>");
+            sb.AppendLine("<table border='1' cellpadding='5' cellspacing='0'>");
+            sb.AppendLine("<tr><th>ID</th><th>Nombre Completo</th><th>Correo</th><th>Rol</th><th>Estado</th></tr>");
+
+            foreach (var u in usuarios)
+            {
+                sb.AppendLine($"<tr><td>{u.IdUsuario}</td><td>{u.Nombre_Completo}</td><td>{u.Correo}</td><td>{u.Id_Rol}</td><td>{(u.Estado ? "Activo" : "Inactivo")}</td></tr>");
+            }
+
+            sb.AppendLine("</table></body></html>");
+
+            return Content(sb.ToString(), "text/html"); // 👈 mismo truco que en clientes
+        }
+
+
     }
+
+
 }
