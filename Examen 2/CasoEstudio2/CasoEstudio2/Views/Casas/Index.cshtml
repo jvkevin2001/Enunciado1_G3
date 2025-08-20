@@ -1,0 +1,30 @@
+﻿@{
+    ViewData["Title"] = "Index";
+}
+<div class="col-md-4">
+    <div class="course-card p-3 shadow-sm rounded-3">
+        <div class="course-thumb">
+            <img src="~/img/Banner_ver_ejercicos.png" alt="Alquiler de Casas" style="width: 100%; height: 150px; object-fit: cover;">
+        </div>
+        <div class="pt-3">
+            <span class="category-badge">Casas</span>
+            <p class="course-title">Consulta y alquiler de casas</p>
+            <p class="text-muted mb-2">Gestión de alquileres y disponibilidad</p>
+            <a asp-controller="Casas" asp-action="Consultar_Casas" class="btn btn-primary w-100">Ver casas</a>
+        </div>
+    </div>
+</div>
+
+<div class="col-md-4">
+    <div class="course-card p-3">
+        <div class="course-thumb">
+            <img src="~/img/Banner_ver_ejercicos.png" alt="Lista de Ejercicios" style="width: 100%; height: 150px; object-fit: cover;">
+        </div>
+        <div class="pt-3">
+            <span class="category-badge">Listado de Abonos</span>
+            <p class="course-title">Visualiza y gestiona todos los abonos en el sistema</p>
+            <p class="text-muted mb-2">Gestión de abonos</p>
+            <a asp-controller="Abonos" asp-action="form_compras" class="btn btn-primary w-100">Ver Ejercicios</a>
+        </div>
+    </div>
+</div>

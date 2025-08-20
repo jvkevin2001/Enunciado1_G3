@@ -1,0 +1,63 @@
+body {
+    background-color: #f5f6fa;
+}
+
+.navbar {
+    background-color: #2B338C;
+}
+
+    .navbar a, .navbar .navbar-brand {
+        color: white;
+    }
+
+    .navbar .btn-yellow {
+        background-color: #ffd900;
+        color: black;
+        font-weight: bold;
+    }
+
+.course-card {
+    border-radius: 15px;
+    background-color: white;
+    box-shadow: 0 0 8px rgba(0,0,0,0.1);
+    overflow: hidden;
+    transition: transform 0.2s;
+}
+
+    .course-card:hover {
+        transform: translateY(-5px);
+    }
+
+.course-thumb {
+    height: 150px;
+    background-color: #ddd;
+}
+
+.course-title {
+    font-size: 1rem;
+    font-weight: bold;
+}
+
+.category-badge {
+    font-size: 0.75rem;
+    color: orange;
+}
+
+.btn-yellow {
+    background-color: #ffd900;
+    color: #000;
+    font-weight: bold;
+}
+
+.navbar img {
+    height: 40px;
+}
+
+.icon-btn {
+    font-size: 1.5rem;
+    color: #fff;
+}
+
+.titulos {
+    color: #2B338C;
+}

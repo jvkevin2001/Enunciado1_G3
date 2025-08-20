@@ -1,0 +1,51 @@
+-- Crear la base de datos
+CREATE DATABASE CasoEstudioJN;
+GO
+
+-- Usar la base de datos
+USE CasoEstudioJN;
+GO
+
+-- Crear la tabla
+CREATE TABLE CasasSistema (
+    IdCasa BIGINT IDENTITY(1,1) PRIMARY KEY NOT NULL,
+    DescripcionCasa VARCHAR(30) NOT NULL,
+    PrecioCasa DECIMAL(10,2) NOT NULL, 
+    UsuarioAlquiler VARCHAR(30) NULL,
+    FechaAlquiler DATETIME NULL
+);
+
+
+INSERT INTO [dbo].[CasasSistema] ([DescripcionCasa],[PrecioCasa],[UsuarioAlquiler],[FechaAlquiler]) 
+VALUES ('Casa en San José',190000,null,null) 
+INSERT INTO [dbo].[CasasSistema] ([DescripcionCasa],[PrecioCasa],[UsuarioAlquiler],[FechaAlquiler]) 
+VALUES ('Casa en Alajuela',145000,null,null) 
+INSERT INTO [dbo].[CasasSistema] ([DescripcionCasa],[PrecioCasa],[UsuarioAlquiler],[FechaAlquiler]) 
+VALUES ('Casa en Cartago',115000,null,null) 
+INSERT INTO [dbo].[CasasSistema] ([DescripcionCasa],[PrecioCasa],[UsuarioAlquiler],[FechaAlquiler]) 
+VALUES ('Casa en Heredia',122000,null,null) 
+INSERT INTO [dbo].[CasasSistema] ([DescripcionCasa],[PrecioCasa],[UsuarioAlquiler],[FechaAlquiler]) 
+VALUES ('Casa en Guanacaste',105000,null,null)
+
+select * from CasasSistema	
+
+
+CREATE PROCEDURE sp_ConsultarCasas
+AS
+BEGIN
+    SELECT 
+        DescripcionCasa,
+        PrecioCasa,
+        UsuarioAlquiler,
+        CASE 
+            WHEN UsuarioAlquiler IS NULL THEN 'Disponible'
+            ELSE 'Reservada'
+        END AS Estado,
+        FORMAT(FechaAlquiler, 'dd/MM/yyyy') AS FechaAlquiler
+    FROM CasasSistema
+    WHERE PrecioCasa BETWEEN 115000 AND 180000
+    ORDER BY Estado; 
+END;
+
+
+exec sp_ConsultarCasas

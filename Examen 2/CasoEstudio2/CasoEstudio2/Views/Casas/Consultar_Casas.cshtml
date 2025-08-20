@@ -1,0 +1,38 @@
+﻿@model List<CasoEstudio2.Models.CasasModel>
+
+@if (ViewBag.Error != null)
+{
+    <div class="alert alert-danger">
+        @ViewBag.Error
+    </div>
+}
+
+<table class="table table-striped table-bordered">
+    <thead class="table-dark">
+        <tr>
+            <th>Descripción</th>
+            <th>Precio</th>
+            <th>Usuario</th>
+            <th>Fecha Alquiler</th>
+            <th>Estado</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var casa in Model)
+        {
+            <tr>
+                <td>@casa.DescripcionCasa</td>
+                <td>₡@casa.PrecioCasa</td>
+                <td>@(string.IsNullOrEmpty(casa.UsuarioAlquiler) ? "N/A" : casa.UsuarioAlquiler)</td>
+                <td>@(string.IsNullOrEmpty(casa.FechaAlquiler) ? "-" : casa.FechaAlquiler)</td>
+                <td>
+                    <span class="badge @(casa.Estado == "Disponible" ? "bg-success" : "bg-secondary")">
+                        @casa.Estado
+                    </span>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<a class="btn btn-primary" asp-controller="Casas" asp-action="Index"> Vovler</a>
