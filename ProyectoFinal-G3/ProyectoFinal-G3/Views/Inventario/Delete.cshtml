@@ -1,0 +1,38 @@
+﻿@model ProyectoFinal_G3.Models.Inventario
+
+@{
+    ViewData["Title"] = "Eliminar Producto";
+}
+
+<h1>Eliminar Producto</h1>
+
+<h3 class="text-danger">¿Está seguro de que desea eliminar este producto?</h3>
+<div>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-3">
+            @Html.DisplayNameFor(model => model.ProductoNombre)
+        </dt>
+        <dd class="col-sm-9">
+            @Html.DisplayFor(model => model.ProductoNombre)
+        </dd>
+        <dt class="col-sm-3">
+            @Html.DisplayNameFor(model => model.Cantidad)
+        </dt>
+        <dd class="col-sm-9">
+            @Html.DisplayFor(model => model.Cantidad)
+        </dd>
+        <dt class="col-sm-3">
+            @Html.DisplayNameFor(model => model.Proveedor)
+        </dt>
+        <dd class="col-sm-9">
+            @Html.DisplayFor(model => model.Proveedor)
+        </dd>
+    </dl>
+
+    <form asp-action="Delete">
+        <input type="hidden" asp-for="Id_Inventario" />
+        <input type="submit" value="Eliminar" class="btn btn-danger" /> |
+        <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>

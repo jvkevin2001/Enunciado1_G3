@@ -7,6 +7,7 @@ using Proyecto_API.Models;
 using Proyecto_API.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
+using System.Security.Claims;
 
 [Route("api/[controller]")]
 [ApiController]
@@ -32,17 +33,20 @@ public class InventarioController : ControllerBase
         {
             using (var connection = new SqlConnection(_connectionString))
             {
-                // Llama a tu procedimiento almacenado 'p_GetInventario'
                 var productos = await connection.QueryAsync<Inventario>(
                     "p_GetInventario",
                     commandType: CommandType.StoredProcedure
                 );
-                return Ok(_util.RespuestaExitosa(productos));
+                // ¡CAMBIO CLAVE AQUÍ!
+                // Devolvemos la lista de productos directamente.
+                return Ok(productos);
             }
         }
         catch (Exception ex)
         {
-            return StatusCode(500, $"Error interno: {ex.Message}");
+            // En caso de error, sí puedes devolver el objeto de respuesta estándar
+            // para mantener consistencia en los errores.
+            return StatusCode(500, new { mensaje = $"Error interno: {ex.Message}" });
         }
     }
 
