@@ -1,6 +1,7 @@
 ﻿@{
     ViewData["Title"] = "Index";
 }
+
 <div class="col-md-4">
     <div class="course-card p-3 shadow-sm rounded-3">
         <div class="course-thumb">
@@ -8,23 +9,23 @@
         </div>
         <div class="pt-3">
             <span class="category-badge">Casas</span>
-            <p class="course-title">Consulta y alquiler de casas</p>
-            <p class="text-muted mb-2">Gestión de alquileres y disponibilidad</p>
+            <p class="course-title">Consulta de casas</p>
+            <p class="text-muted mb-2">Visualiza todas las casas y disponibilidad</p>
             <a asp-controller="Casas" asp-action="Consultar_Casas" class="btn btn-primary w-100">Ver casas</a>
         </div>
     </div>
 </div>
 
 <div class="col-md-4">
-    <div class="course-card p-3">
+    <div class="course-card p-3 shadow-sm rounded-3">
         <div class="course-thumb">
-            <img src="~/img/Banner_ver_ejercicos.png" alt="Lista de Ejercicios" style="width: 100%; height: 150px; object-fit: cover;">
+            <img src="~/img/Banner_ver_ejercicos.png" alt="Alquilar Casa" style="width: 100%; height: 150px; object-fit: cover;">
         </div>
         <div class="pt-3">
-            <span class="category-badge">Listado de Abonos</span>
-            <p class="course-title">Visualiza y gestiona todos los abonos en el sistema</p>
-            <p class="text-muted mb-2">Gestión de abonos</p>
-            <a asp-controller="Abonos" asp-action="form_compras" class="btn btn-primary w-100">Ver Ejercicios</a>
+            <span class="category-badge">Alquiler</span>
+            <p class="course-title">Alquilar una casa</p>
+            <p class="text-muted mb-2">Selecciona y alquila casas disponibles</p>
+            <a asp-controller="Casas" asp-action="Alquilar" class="btn btn-success w-100">Alquilar casa</a>
         </div>
     </div>
 </div>

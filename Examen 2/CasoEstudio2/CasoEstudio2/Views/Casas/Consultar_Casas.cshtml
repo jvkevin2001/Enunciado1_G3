@@ -1,5 +1,11 @@
 ﻿@model List<CasoEstudio2.Models.CasasModel>
 
+@{
+    ViewData["Title"] = "Consulta de Casas";
+}
+
+<h2>🏠 Consulta de Casas</h2>
+
 @if (ViewBag.Error != null)
 {
     <div class="alert alert-danger">
@@ -24,15 +30,19 @@
                 <td>@casa.DescripcionCasa</td>
                 <td>₡@casa.PrecioCasa</td>
                 <td>@(string.IsNullOrEmpty(casa.UsuarioAlquiler) ? "N/A" : casa.UsuarioAlquiler)</td>
-                <td>@(string.IsNullOrEmpty(casa.FechaAlquiler) ? "-" : casa.FechaAlquiler)</td>
                 <td>
-                    <span class="badge @(casa.Estado == "Disponible" ? "bg-success" : "bg-secondary")">
-                        @casa.Estado
-                    </span>
-                </td>
-            </tr>
-        }
+                    @(string.IsNullOrEmpty(casa.FechaAlquiler)
+                                    ? "-"
+                                    : DateTime.Parse(casa.FechaAlquiler).ToString("dd/MM/yyyy"))
+            </td>
+            <td>
+                <span class="badge @(casa.Estado == "Disponible" ? "bg-success" : "bg-secondary")">
+                    @casa.Estado
+                </span>
+            </td>
+        </tr>
+                }
     </tbody>
 </table>
 
-<a class="btn btn-primary" asp-controller="Casas" asp-action="Index"> Vovler</a>
+<a class="btn btn-primary" asp-controller="Casas" asp-action="Index">Volver</a>

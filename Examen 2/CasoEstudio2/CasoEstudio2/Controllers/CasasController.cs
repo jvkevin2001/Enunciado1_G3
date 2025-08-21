@@ -52,7 +52,51 @@ namespace CasoEstudio2.Controllers
             return View(viewModel);
         }
 
+        [HttpGet]
+        public IActionResult Alquilar()
+        {
+            TempData.Remove("Mensaje");
+            TempData.Remove("Error");
 
+            using var http = _http.CreateClient();
+            http.BaseAddress = new Uri(_configuration["Start:ApiUrl"]);
+
+            var response = http.GetAsync("api/Home/CasasDisponibles").Result;
+            if (response.IsSuccessStatusCode)
+            {
+                var casas = response.Content.ReadFromJsonAsync<List<CasasModel>>().Result;
+                ViewBag.CasasDisponibles = casas;
+            }
+            else
+            {
+                ViewBag.CasasDisponibles = new List<CasasModel>();
+            }
+
+            return View();
+        }
+
+
+
+
+        [HttpPost]
+        public async Task<IActionResult> Alquilar(CasasModel model)
+        {
+            using var http = _http.CreateClient();
+            http.BaseAddress = new Uri(_configuration["Start:ApiUrl"]);
+
+            var response = await http.PostAsJsonAsync("api/Home/Alquilar_Casa", model);
+
+            if (response.IsSuccessStatusCode)
+            {
+                TempData["Mensaje"] = "Casa alquilada con éxito";
+                return RedirectToAction("Consultar_Casas", "Casas");
+            }
+            else
+            {
+                TempData["Error"] = "No se pudo alquilar la casa";
+                return RedirectToAction("Alquilar", "Casas");
+            }
+        }
 
     }
 }

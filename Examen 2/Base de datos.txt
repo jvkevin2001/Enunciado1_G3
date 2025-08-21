@@ -16,6 +16,59 @@ CREATE TABLE CasasSistema (
 );
 
 
+- Consulta a casas en la vista, solo en el rango
+CREATE OR ALTER PROCEDURE sp_ConsultarCasas
+AS
+BEGIN
+    SELECT 
+        IdCasa,
+        DescripcionCasa,
+        PrecioCasa,
+        UsuarioAlquiler,
+        FechaAlquiler,
+        CASE 
+            WHEN UsuarioAlquiler IS NULL THEN 'Disponible'
+            ELSE 'Reservada'
+        END AS Estado
+    FROM CasasSistema
+    WHERE PrecioCasa BETWEEN 115000 AND 180000
+    ORDER BY 
+        CASE WHEN UsuarioAlquiler IS NULL THEN 1 ELSE 2 END;
+END
+GO
+
+-- Consulta casas dentro de la vista alquiler, aqui si se listan todas las casas sin filtrar precio
+CREATE OR ALTER PROCEDURE sp_CasasDisponibles
+AS
+BEGIN
+    SELECT 
+        IdCasa,
+        DescripcionCasa,
+        PrecioCasa
+    FROM CasasSistema
+    WHERE UsuarioAlquiler IS NULL
+    ORDER BY DescripcionCasa;
+END
+GO
+
+-- Procedimiento de alquilar casa
+CREATE OR ALTER PROCEDURE sp_AlquilarCasa
+    @IdCasa BIGINT,
+    @UsuarioAlquiler VARCHAR(30),
+    @FechaAlquiler DATETIME
+AS
+BEGIN
+    UPDATE CasasSistema
+    SET UsuarioAlquiler = @UsuarioAlquiler,
+        FechaAlquiler = @FechaAlquiler
+    WHERE IdCasa = @IdCasa
+      AND UsuarioAlquiler IS NULL;
+END
+GO
+
+-- Segmento para pruebas!
+TRUNCATE TABLE CasasSistema;
+
 INSERT INTO [dbo].[CasasSistema] ([DescripcionCasa],[PrecioCasa],[UsuarioAlquiler],[FechaAlquiler]) 
 VALUES ('Casa en San José',190000,null,null) 
 INSERT INTO [dbo].[CasasSistema] ([DescripcionCasa],[PrecioCasa],[UsuarioAlquiler],[FechaAlquiler]) 
@@ -25,27 +78,4 @@ VALUES ('Casa en Cartago',115000,null,null)
 INSERT INTO [dbo].[CasasSistema] ([DescripcionCasa],[PrecioCasa],[UsuarioAlquiler],[FechaAlquiler]) 
 VALUES ('Casa en Heredia',122000,null,null) 
 INSERT INTO [dbo].[CasasSistema] ([DescripcionCasa],[PrecioCasa],[UsuarioAlquiler],[FechaAlquiler]) 
-VALUES ('Casa en Guanacaste',105000,null,null)
-
-select * from CasasSistema	
-
-
-CREATE PROCEDURE sp_ConsultarCasas
-AS
-BEGIN
-    SELECT 
-        DescripcionCasa,
-        PrecioCasa,
-        UsuarioAlquiler,
-        CASE 
-            WHEN UsuarioAlquiler IS NULL THEN 'Disponible'
-            ELSE 'Reservada'
-        END AS Estado,
-        FORMAT(FechaAlquiler, 'dd/MM/yyyy') AS FechaAlquiler
-    FROM CasasSistema
-    WHERE PrecioCasa BETWEEN 115000 AND 180000
-    ORDER BY Estado; 
-END;
-
-
-exec sp_ConsultarCasas
+VALUES ('Casa en Guanacaste',105000,null,null) 

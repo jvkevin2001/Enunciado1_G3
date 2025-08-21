@@ -1,0 +1,56 @@
+﻿@model CasoEstudio2.Models.CasasModel
+
+@{
+    ViewData["Title"] = "Alquilar Casa";
+}
+
+<h2>🏡 Alquilar Casa</h2>
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+@if (TempData["Mensaje"] != null)
+{
+    <div class="alert alert-success">@TempData["Mensaje"]</div>
+}
+
+<form method="post" asp-action="Alquilar" asp-controller="Casas">
+    <div class="mb-3">
+        <label class="form-label">Seleccione una casa</label>
+        <select asp-for="IdCasa" class="form-select" id="casaSelect" required>
+            <option value="">-- Seleccione --</option>
+            @foreach (var casa in ViewBag.CasasDisponibles)
+            {
+                <option value="@casa.IdCasa" data-precio="@casa.PrecioCasa">
+                    @casa.DescripcionCasa
+                </option>
+            }
+        </select>
+        <span asp-validation-for="IdCasa" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Precio mensual</label>
+        <input type="text" id="precioCasa" class="form-control" readonly />
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="UsuarioAlquiler" class="form-label">Usuario que alquila</label>
+        <input asp-for="UsuarioAlquiler" class="form-control" required />
+        <span asp-validation-for="UsuarioAlquiler" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-success">Alquilar</button>
+    <a asp-action="Index" asp-controller="Casas" class="btn btn-secondary">Volver</a>
+</form>
+
+@section Scripts {
+    <script>
+        document.getElementById("casaSelect").addEventListener("change", function () {
+            var selectedOption = this.options[this.selectedIndex];
+            var precio = selectedOption.getAttribute("data-precio");
+            document.getElementById("precioCasa").value = precio ? "₡" + precio : "";
+        });
+    </script>
+}

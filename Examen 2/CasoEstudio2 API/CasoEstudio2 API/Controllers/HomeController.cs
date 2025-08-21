@@ -31,6 +31,36 @@ namespace CasoEstudio2_API.Controllers
                 return Ok(compras);
             }
         }
+        [HttpPost]
+        [Route("Alquilar_Casa")]
+        public IActionResult AlquilarCasa([FromBody] CasasModel request)
+        {
+            using (var connection = new SqlConnection(_configuration.GetConnectionString("Connection")))
+            {
+                var parametros = new
+                {
+                    IdCasa = request.IdCasa,
+                    UsuarioAlquiler = request.UsuarioAlquiler,
+                    FechaAlquiler = DateTime.Now
+                };
+
+                var filas = connection.Execute("sp_AlquilarCasa", parametros, commandType: CommandType.StoredProcedure);
+
+                if (filas > 0)
+                    return Ok(new { mensaje = "Casa alquilada con éxito" });
+                else
+                    return BadRequest(new { mensaje = "No se pudo alquilar la casa" });
+            }
+        }
+
+        [HttpGet]
+        [Route("CasasDisponibles")]
+        public IActionResult CasasDisponibles()
+        {
+            using var connection = new SqlConnection(_configuration.GetConnectionString("Connection"));
+            var casas = connection.Query<CasasModel>("sp_CasasDisponibles", commandType: CommandType.StoredProcedure).ToList();
+            return Ok(casas);
+        }
 
     }
 }
