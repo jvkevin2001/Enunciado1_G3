@@ -1,0 +1,95 @@
+﻿@model ProyectoFinal_G3.Models.CambiarContrasennaViewModel
+
+@{
+    ViewData["Title"] = "Cambiar Contraseña";
+    Layout = "_LayoutExterno";
+}
+
+<link href="~/css/login.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<div class="col-lg-5 mx-auto">
+    <br /><br />
+    <div class="text-center mb-4">
+        <img src="~/img/logo_sin_fondo.png" alt="Logo" style="height:300px; width:auto; max-width:100%; object-fit:contain;">
+    </div>
+
+    <div class="card shadow-lg border-0 rounded-lg">
+        <div class="card-header">
+            <h3 class="text-center my-3">Cambiar Contraseña</h3>
+        </div>
+        <div class="card-body">
+            <form id="formCambiarContrasenna">
+
+                <div class="form-floating mb-3">
+                    <input asp-for="ContrasennaActual" class="form-control" id="ContrasennaActual" type="password" placeholder="Contraseña actual" />
+                    <label for="ContrasennaActual">Contraseña actual</label>
+                </div>
+
+                <div class="form-floating mb-3">
+                    <input asp-for="ContrasennaNueva" class="form-control" id="ContrasennaNueva" type="password" placeholder="Nueva contraseña" />
+                    <label for="ContrasennaNueva">Nueva contraseña</label>
+                </div>
+
+                <div class="form-floating mb-3">
+                    <input class="form-control" id="ConfirmarContrasenna" type="password" placeholder="Confirmar nueva contraseña" />
+                    <label for="ConfirmarContrasenna">Confirmar nueva contraseña</label>
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100">Actualizar Contraseña</button>
+                <br />
+                <br />
+                <a class="btn btn-primary w-100" asp-controller="Home" asp-action="Index"> Volver</a>
+            </form>
+        </div>
+        
+    </div>
+</div>
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    $(document).ready(function () {
+        $("#formCambiarContrasenna").on("submit", function (e) {
+            e.preventDefault();
+
+            const actual = $("#ContrasennaActual").val().trim();
+            const nueva = $("#ContrasennaNueva").val().trim();
+            const confirmar = $("#ConfirmarContrasenna").val().trim();
+
+            // Validaciones
+            if (!actual || !nueva || !confirmar) {
+                Swal.fire('Error', 'Todos los campos son obligatorios', 'error');
+                return;
+            }
+
+            if (nueva !== confirmar) {
+                Swal.fire('Error', 'La nueva contraseña y la confirmación no coinciden', 'error');
+                return;
+            }
+
+            $.ajax({
+                url: '/Usuarios/CambiarContrasennaAjax',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    ContrasennaActual: actual,
+                    ContrasennaNueva: nueva
+                }),
+                success: function (data) {
+                    if (data.success) {
+                        Swal.fire('Éxito', data.mensaje, 'success');
+                        $("#formCambiarContrasenna")[0].reset();
+                    } else {
+                        Swal.fire('Error', data.mensaje || 'Ocurrió un error', 'error');
+                    }
+                },
+                error: function () {
+                    Swal.fire('Error', 'No se pudo conectar con el servidor', 'error');
+                }
+            });
+        });
+    });
+</script>

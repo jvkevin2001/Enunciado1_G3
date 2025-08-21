@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using ProyectoFinal_G3.Models;
 using ProyectoFinal_G3.Services;
 using System;
+using System.Reflection;
 using System.Text.Json;
 
 namespace ProyectoFinal_G3.Controllers
@@ -96,6 +97,7 @@ namespace ProyectoFinal_G3.Controllers
                     HttpContext.Session.SetString("IdUsuario", datos?.Contenido?.IdUsuario.ToString()!);
                     HttpContext.Session.SetString("Nombre", datos?.Contenido?.Nombre_Completo!);
                     HttpContext.Session.SetString("IdRol", datos?.Contenido?.Id_Rol.ToString()!);
+                    HttpContext.Session.SetString("Correo", datos?.Contenido?.Correo!);
                     HttpContext.Session.SetString("JWT", datos?.Contenido?.Token ?? "");
 
                     return RedirectToAction("Index", "Home");
@@ -141,6 +143,46 @@ namespace ProyectoFinal_G3.Controllers
                 // Evitamos leer JSON si no hay
                 ViewBag.Mensaje = "Ocurrió un error al enviar el correo.";
                 return View();
+            }
+        }
+
+        [HttpGet]
+        public IActionResult CambiarContrasenna()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [Route("Usuarios/CambiarContrasennaAjax")]
+        public async Task<IActionResult> CambiarContrasennaAjax([FromBody] CambiarContrasennaViewModel model)
+        {
+            try
+            {
+                using var http = _http.CreateClient();
+                http.BaseAddress = new Uri(_configuration.GetSection("Start:ApiUrl").Value!);
+
+                var resultado = await http.PostAsJsonAsync("api/Usuarios/CambiarContrasenna", new
+                {
+                    Correo = HttpContext.Session.GetString("Correo"),
+                    ContrasennaActual = model.ContrasennaActual,
+                    ContrasennaNueva = model.ContrasennaNueva
+                });
+
+                var respuesta = await resultado.Content.ReadFromJsonAsync<JsonElement>();
+                string mensaje = respuesta.TryGetProperty("Mensaje", out var prop) ? prop.GetString()! : "Operación completada";
+
+                if (resultado.IsSuccessStatusCode)
+                {
+                    return Json(new { success = true, mensaje });
+                }
+                else
+                {
+                    return Json(new { success = false, mensaje });
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, mensaje = "Error en el servidor: " + ex.Message });
             }
         }
 

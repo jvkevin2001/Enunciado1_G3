@@ -38,7 +38,7 @@
             @using Microsoft.AspNetCore.Http
 
             @{
-                var rol = Context.Session.GetString("IdRol"); // o HttpContext.Session.GetString("IdRol")
+                var rol = Context.Session.GetString("IdRol"); 
             }
 
 
@@ -62,7 +62,12 @@
                             </a>
                         </li>
                     }
-
+                    <li class="nav-item">
+                        <a class="nav-link d-flex align-items-center" asp-controller="Usuario" asp-action="CambiarContrasenna" style="font-size: 0.85rem;">
+                            <i class="fas fa-key me-1"></i>
+                            <span class="d-none d-lg-inline">Ajustes</span>
+                        </a>
+                    </li>
 
 
                     <a class="dropdown-item" asp-controller="Usuario" asp-action="CerrarSesion">

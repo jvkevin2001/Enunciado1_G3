@@ -158,6 +158,35 @@ namespace Proyecto_API.Controllers
             }
         }
 
+        [HttpPost]
+        [Route("CambiarContrasenna")]
+        public IActionResult CambiarContrasennaAjax([FromBody] CambiarContrasennaViewModel model)
+        {
+
+
+            var actualEncriptada = _utilitarios.Encrypt(model.ContrasennaActual);
+            var nuevaEncriptada = _utilitarios.Encrypt(model.ContrasennaNueva);
+
+            using var context = new SqlConnection(_configuration.GetConnectionString("Connection"));
+
+            var resultado = context.QueryFirstOrDefault<int>(
+                "CambiarContrasenna",
+                new
+                {
+                    Correo = model.Correo,
+                    ContrasennaActual = actualEncriptada,
+                    ContrasennaNueva = nuevaEncriptada
+                },
+                commandType: CommandType.StoredProcedure
+            );
+
+            if (resultado == 1)
+                return Ok(new { mensaje = "Contraseña actualizada correctamente" });
+            else
+                return BadRequest(new { mensaje = "Contraseña actual incorrecta" });
+        }
+
+
 
 
 
