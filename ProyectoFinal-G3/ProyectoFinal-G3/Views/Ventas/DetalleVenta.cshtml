@@ -5,6 +5,12 @@
 
 <h2 class="text-white">Venta #@venta?.Id_Venta</h2>
 
+<a class="btn btn-danger mb-3"
+   href="@Url.Action("ExportarFactura", "Ventas", new { id = venta?.Id_Venta })">
+    Exportar PDF
+</a>
+
+
 <p class="text-light">
     Cliente: @(venta?.Cliente?.NombreCliente ?? "Sin cliente")
 </p>

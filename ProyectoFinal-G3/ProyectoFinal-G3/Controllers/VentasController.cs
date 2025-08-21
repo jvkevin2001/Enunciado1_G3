@@ -1,6 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Net.Http.Json;
+using Microsoft.AspNetCore.Mvc;
 using ProyectoFinal_G3.Models;
-using System.Net.Http.Json;
+using QuestPDF.Helpers;
+using QuestPDF.Fluent;
+using QuestPDF.Helpers;
+using QuestPDF.Infrastructure;
 
 namespace ProyectoFinal_G3.Controllers
 {
@@ -21,11 +25,11 @@ namespace ProyectoFinal_G3.Controllers
             using var http = _http.CreateClient();
             http.BaseAddress = new Uri(_configuration.GetSection("Start:ApiUrl").Value!);
 
-            
+
             var clientesResponse = http.GetFromJsonAsync<RespuestaEstandar<List<Cliente>>>("api/Clientes/ObtenerClientes").Result;
             ViewBag.Clientes = clientesResponse?.Contenido ?? new List<Cliente>();
 
-            
+
             var productosResponse = http.GetFromJsonAsync<List<Inventario>>("api/Inventario/Listar").Result;
             var productosJs = new List<dynamic>();
 
@@ -191,6 +195,129 @@ namespace ProyectoFinal_G3.Controllers
 
             return View();
         }
+
+        [HttpGet]
+        public IActionResult ExportarFactura(int id)
+        {
+            QuestPDF.Settings.License = QuestPDF.Infrastructure.LicenseType.Community;
+
+            using var http = _http.CreateClient();
+            http.BaseAddress = new Uri(_configuration.GetSection("Start:ApiUrl").Value!);
+
+            var response = http.GetAsync($"api/Ventas/ObtenerVentaCompleta/{id}").Result;
+            if (!response.IsSuccessStatusCode)
+            {
+                TempData["Error"] = "No se pudo generar la factura.";
+                return RedirectToAction("Ventas");
+            }
+
+            var jsonString = response.Content.ReadAsStringAsync().Result;
+            using var doc = System.Text.Json.JsonDocument.Parse(jsonString);
+            var root = doc.RootElement;
+
+            if (!root.TryGetProperty("contenido", out var contenido))
+            {
+                TempData["Error"] = "No se encontró información de la factura.";
+                return RedirectToAction("Ventas");
+            }
+
+            var clientesResponse = http.GetFromJsonAsync<RespuestaEstandar<List<Cliente>>>("api/Clientes/ObtenerClientes").Result;
+            var clientes = clientesResponse?.Contenido ?? new List<Cliente>();
+            var venta = new ProyectoFinal_G3.Models.Venta
+            {
+                Id_Venta = 0,
+                FechaVenta = DateTime.Now,
+                Total = 0m,
+                Cliente = new ProyectoFinal_G3.Models.Cliente { NombreCliente = "Sin cliente" }
+            };
+
+            if (contenido.TryGetProperty("venta", out var ventaJson))
+            {
+                venta.Id_Venta = ventaJson.TryGetProperty("id_Venta", out var idProp) ? idProp.GetInt32() : 0;
+                venta.FechaVenta = ventaJson.TryGetProperty("fechaVenta", out var fechaProp) ? fechaProp.GetDateTime() : DateTime.Now;
+                venta.Total = ventaJson.TryGetProperty("total", out var totalVentaProp) ? totalVentaProp.GetDecimal() : 0m;
+
+                var idCliente = ventaJson.TryGetProperty("id_Cliente", out var idClienteProp) ? idClienteProp.GetInt32() : 0;
+                venta.Cliente = clientes.FirstOrDefault(c => c.Id_Clientes == idCliente) ?? new Cliente { NombreCliente = "Sin cliente" };
+            }
+
+            var detalles = new List<ProyectoFinal_G3.Models.DetalleVenta>();
+            if (contenido.TryGetProperty("detalles", out var detallesJson))
+            {
+                foreach (var d in detallesJson.EnumerateArray())
+                {
+                    detalles.Add(new ProyectoFinal_G3.Models.DetalleVenta
+                    {
+                        Cantidad = d.TryGetProperty("cantidad", out var cantidadProp) ? cantidadProp.GetInt32() : 0,
+                        PrecioTotal = d.TryGetProperty("precioTotal", out var precioTotalProp) ? precioTotalProp.GetDecimal() : 0m,
+                        Producto = new ProyectoFinal_G3.Models.Inventario
+                        {
+                            ProductoNombre = d.TryGetProperty("productoNombre", out var productoNombreProp) ? productoNombreProp.GetString() ?? "Sin nombre" : "Sin nombre",
+                            PrecioUnitario = d.TryGetProperty("precioUnitario", out var precioUnitarioProp) ? precioUnitarioProp.GetDecimal() : 0m
+                        }
+                    });
+                }
+            }
+
+            var pdf = Document.Create(container =>
+            {
+                container.Page(page =>
+                {
+                    page.Margin(30);
+                    page.Size(PageSizes.A4);
+
+                    page.Header().Text($"Factura #{venta.Id_Venta}")
+                        .FontSize(20).Bold().FontColor(Colors.Blue.Medium);
+
+                    page.Content().Column(col =>
+                    {
+                        col.Spacing(5);
+
+                        col.Item().Text($"Cliente: {venta.Cliente.NombreCliente}");
+                        col.Item().Text($"Fecha: {venta.FechaVenta:yyyy-MM-dd}");
+                        col.Item().Text($"Total: ₡{venta.Total:N2}").Bold();
+
+                        col.Item().LineHorizontal(1);
+
+                        col.Item().Table(table =>
+                        {
+                            table.ColumnsDefinition(columns =>
+                            {
+                                columns.RelativeColumn();
+                                columns.ConstantColumn(80);
+                                columns.ConstantColumn(100);
+                                columns.ConstantColumn(100);
+                            });
+
+                            table.Header(header =>
+                            {
+                                header.Cell().Text("Producto").Bold();
+                                header.Cell().Text("Cantidad").Bold();
+                                header.Cell().Text("Precio Unitario").Bold();
+                                header.Cell().Text("Total").Bold();
+                            });
+
+                            foreach (var d in detalles)
+                            {
+                                table.Cell().Text(d.Producto.ProductoNombre);
+                                table.Cell().Text(d.Cantidad.ToString());
+                                table.Cell().Text($"₡{(d.Cantidad > 0 ? d.PrecioTotal / d.Cantidad : d.PrecioTotal):N2}");
+                                table.Cell().Text($"₡{d.PrecioTotal:N2}");
+                            }
+                        });
+                    });
+
+                    page.Footer().AlignCenter().Text("Gracias por su compra").Italic();
+                });
+            });
+
+            var stream = new MemoryStream();
+            pdf.GeneratePdf(stream);
+            stream.Position = 0;
+
+            return File(stream, "application/pdf", $"Factura_{venta.Id_Venta}.pdf");
+        }
+
 
 
     }
