@@ -4,57 +4,40 @@
     ViewData["Title"] = "Gestión de Inventario";
 }
 
-<h1>Gestión de Inventario</h1>
+<h1 style="color:white;">Gestión de Inventario</h1>
 
 <p>
-    <a asp-action="Create" class="btn btn-primary">Crear Nuevo Producto</a>
+    <a asp-action="Create" class="btn btn-primary" style="color:white;">Crear Nuevo Producto</a>
 </p>
 
-@* Bloque para mostrar errores, por ejemplo, si no se puede eliminar un ítem *@
 @if (TempData["Error"] != null)
 {
-    <div class="alert alert-danger" role="alert">
+    <div class="alert alert-danger" role="alert" style="color:white;">
         @TempData["Error"]
     </div>
 }
 
-<table class="table table-striped table-hover">
-    <thead class="thead-dark">
+<table class="table table-striped table-hover" style="color:white;">
+    <thead class="thead-dark" style="color:white;">
         <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.ProductoNombre)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Cantidad)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.PrecioUnitario)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Proveedor)
-            </th>
-            <th></th>
+            <th style="color:white;">@Html.DisplayNameFor(model => model.ProductoNombre)</th>
+            <th style="color:white;">@Html.DisplayNameFor(model => model.Cantidad)</th>
+            <th style="color:white;">@Html.DisplayNameFor(model => model.PrecioUnitario)</th>
+            <th style="color:white;">@Html.DisplayNameFor(model => model.Proveedor)</th>
+            <th style="color:white;"></th>
         </tr>
     </thead>
-    <tbody>
+    <tbody style="color:white;">
         @foreach (var item in Model)
         {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.ProductoNombre)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Cantidad)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.PrecioUnitario)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Proveedor)
-                </td>
-                <td>
-                    <a asp-action="Edit" asp-route-id="@item.Id_Inventario" class="btn btn-sm btn-warning">Editar</a> |
-                    <a asp-action="Delete" asp-route-id="@item.Id_Inventario" class="btn btn-sm btn-danger">Eliminar</a>
+            <tr style="color:white;">
+                <td style="color:white;">@Html.DisplayFor(modelItem => item.ProductoNombre)</td>
+                <td style="color:white;">@Html.DisplayFor(modelItem => item.Cantidad)</td>
+                <td style="color:white;">@Html.DisplayFor(modelItem => item.PrecioUnitario)</td>
+                <td style="color:white;">@Html.DisplayFor(modelItem => item.Proveedor)</td>
+                <td style="color:white;">
+                    <a asp-action="Edit" asp-route-id="@item.Id_Inventario" class="btn btn-sm btn-warning" style="color:white;">Editar</a> |
+                    <a asp-action="Delete" asp-route-id="@item.Id_Inventario" class="btn btn-sm btn-danger" style="color:white;">Eliminar</a>
                 </td>
             </tr>
         }
