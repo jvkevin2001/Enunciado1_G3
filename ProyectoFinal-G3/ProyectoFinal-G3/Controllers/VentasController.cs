@@ -20,22 +20,20 @@ namespace ProyectoFinal_G3.Controllers
         }
 
         [HttpGet]
-        public IActionResult CrearVenta()
+        public async Task<IActionResult> CrearVenta()
         {
             using var http = _http.CreateClient();
-            http.BaseAddress = new Uri(_configuration.GetSection("Start:ApiUrl").Value!);
+            http.BaseAddress = new Uri(_configuration["Start:ApiUrl"]);
 
-
-            var clientesResponse = http.GetFromJsonAsync<RespuestaEstandar<List<Cliente>>>("api/Clientes/ObtenerClientes").Result;
+            var clientesResponse = await http.GetFromJsonAsync<RespuestaEstandar<List<Cliente>>>("api/Clientes/ObtenerClientes");
             ViewBag.Clientes = clientesResponse?.Contenido ?? new List<Cliente>();
 
-
-            var productosResponse = http.GetFromJsonAsync<List<Inventario>>("api/Inventario/Listar").Result;
+            var productosResponse = await http.GetFromJsonAsync<RespuestaEstandar<List<Inventario>>>("api/Inventario/Listar");
             var productosJs = new List<dynamic>();
 
-            if (productosResponse != null)
+            if (productosResponse?.Contenido != null)
             {
-                productosJs = productosResponse
+                productosJs = productosResponse.Contenido
                     .Select(p => new
                     {
                         Id_Inventario = p.Id_Inventario,
@@ -51,16 +49,15 @@ namespace ProyectoFinal_G3.Controllers
             return View();
         }
 
-
         [HttpPost]
-        public IActionResult CrearVenta(Venta venta, string detallesJson)
+        public async Task<IActionResult> CrearVenta(Venta venta, string detallesJson)
         {
             var detalles = System.Text.Json.JsonSerializer.Deserialize<List<DetalleVenta>>(detallesJson);
 
             if (detalles == null || detalles.Count == 0)
             {
                 TempData["Error"] = "Debe agregar al menos un producto";
-                return CrearVenta();
+                return await CrearVenta();
             }
 
             var payload = new
@@ -81,9 +78,9 @@ namespace ProyectoFinal_G3.Controllers
             };
 
             using var http = _http.CreateClient();
-            http.BaseAddress = new Uri(_configuration.GetSection("Start:ApiUrl").Value!);
+            http.BaseAddress = new Uri(_configuration["Start:ApiUrl"]);
 
-            var response = http.PostAsJsonAsync("api/Ventas/CrearVenta", payload).Result;
+            var response = await http.PostAsJsonAsync("api/Ventas/CrearVenta", payload);
 
             if (response.IsSuccessStatusCode)
             {
@@ -91,9 +88,9 @@ namespace ProyectoFinal_G3.Controllers
             }
             else
             {
-                var respuesta = response.Content.ReadFromJsonAsync<RespuestaEstandar>().Result;
+                var respuesta = await response.Content.ReadFromJsonAsync<RespuestaEstandar>();
                 TempData["Error"] = respuesta?.Mensaje;
-                return CrearVenta();
+                return await CrearVenta();
             }
         }
 
