@@ -405,11 +405,11 @@ namespace ProyectoFinal_G3.Controllers
             if (!resp.IsSuccessStatusCode)
             {
                 ViewBag.Mensaje = "No se pudieron cargar los usuarios";
-                return View("ReporteUsuarios", new List<Usuario>()); // 👈 aquí el nombre real de la vista
+                return View("ReporteUsuarios", new List<Usuario>()); 
             }
 
             var datos = await resp.Content.ReadFromJsonAsync<RespuestaEstandar<List<Usuario>>>();
-            return View("ReporteUsuarios", datos?.Contenido ?? new List<Usuario>()); // 👈 aquí también
+            return View("ReporteUsuarios", datos?.Contenido ?? new List<Usuario>()); 
         }
 
         [HttpGet]
@@ -463,7 +463,7 @@ namespace ProyectoFinal_G3.Controllers
 
             sb.AppendLine("</table></body></html>");
 
-            return Content(sb.ToString(), "text/html"); // 👈 mismo truco que en clientes
+            return Content(sb.ToString(), "text/html"); 
         }
 
 
