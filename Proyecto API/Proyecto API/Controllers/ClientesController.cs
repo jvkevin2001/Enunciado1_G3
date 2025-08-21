@@ -33,5 +33,24 @@ namespace Proyecto_API.Controllers
                     return BadRequest(_util.RespuestaFallida("No se encuentrar clientes registrados"));
             }
         }
+
+        [HttpPost]
+        [Route("RegistrarClientes")]
+        public IActionResult RegistrarClientes(Cliente data)
+        {
+            using (var context = new SqlConnection(_configuration.GetConnectionString("Connection")))
+            {
+                var result = context.Execute("p_InsertCliente", new
+                {
+                    data.NombreCliente,
+                    data.Correo,
+                    data.Telefono
+                });
+                if (result > 0)
+                    return Ok(_util.RespuestaExitosa(result));
+                else
+                    return BadRequest(_util.RespuestaFallida("No se pudo registrar el cliente"));
+            }
+        }
     }
 }

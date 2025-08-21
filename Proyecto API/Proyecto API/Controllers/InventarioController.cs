@@ -2,10 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Proyecto_API.Models;
 using System.Data;
-using System.Data.SqlClient;
-using Proyecto_API.Models;
 using Proyecto_API.Services;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using System.Security.Claims;
 
@@ -22,7 +19,6 @@ public class InventarioController : ControllerBase
         _util = util;
     }
 
- 
     [HttpGet]
     [Route("Listar")]
     public async Task<IActionResult> ListarProductos()
@@ -35,12 +31,12 @@ public class InventarioController : ControllerBase
                     "p_GetInventario",
                     commandType: CommandType.StoredProcedure
                 );
-                return Ok(productos);
+
+                return Ok(_util.RespuestaExitosa(productos));
             }
         }
         catch (Exception ex)
         {
-         
             return StatusCode(500, new { mensaje = $"Error interno: {ex.Message}" });
         }
     }
