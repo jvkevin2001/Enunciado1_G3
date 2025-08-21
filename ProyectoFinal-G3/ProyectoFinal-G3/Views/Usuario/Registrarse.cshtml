@@ -123,7 +123,6 @@
                 </div>
 
                 <div class="d-flex align-items-center justify-content-between mt-4 mb-0">
-                    <a class="small" href="@Url.Action("Login")">¿Ya tienes cuenta? Inicia sesión</a>
                     <button type="submit" class="btn btn-primary" id="btnRegistrar" >Registrarse</button>
                 </div>
             </form>
@@ -169,7 +168,7 @@
                     title: 'Éxito',
                     text: response.message
                 }).then(() => {
-                    window.location.href = '/Home/Index';
+                    window.location.href = '/Reportes/Usuarios';
                 });
             },
             error: function(xhr) {

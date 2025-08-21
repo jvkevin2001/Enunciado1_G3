@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using ProyectoFinal_G3.Models;
 using ProyectoFinal_G3.Services;
+using System;
 using System.Text.Json;
 
 namespace ProyectoFinal_G3.Controllers
@@ -65,7 +66,7 @@ namespace ProyectoFinal_G3.Controllers
 
                 if (resultado.IsSuccessStatusCode)
                 {
-                    return Ok(new { message = "Usuario registrado correctamente" });
+                    return RedirectToAction("Usuarios", "Reportes");
                 }
                 else
                 {
