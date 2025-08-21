@@ -1,0 +1,138 @@
+﻿@model ProyectoFinal_G3.Models.Venta
+@{
+    ViewData["Title"] = "Crear Venta";
+}
+
+<h2 class="text-white">Crear Venta</h2>
+
+<form asp-action="CrearVenta" method="post" class="row g-3 mb-4" id="formVenta">
+
+    <div class="col-md-4">
+        <label class="form-label text-white">Cliente</label>
+        <select asp-for="Id_Cliente" class="form-select bg-dark text-light border-secondary" required>
+            <option value="">Seleccione cliente</option>
+            @foreach (var c in ViewBag.Clientes)
+            {
+                <option value="@c.Id_Clientes">@c.NombreCliente</option>
+            }
+        </select>
+    </div>
+
+    <div class="col-md-12">
+        <label class="form-label text-white">Productos</label>
+        <table class="table table-dark table-bordered text-light" id="productosTabla">
+            <thead>
+                <tr>
+                    <th>Producto</th>
+                    <th>Cantidad</th>
+                    <th>Precio Unitario</th>
+                    <th>Total</th>
+                    <th>Acción</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+        <button type="button" class="btn btn-outline-light" id="btnAgregarProducto">Agregar Producto</button>
+    </div>
+
+    <div class="col-md-3 mt-3">
+        <label class="form-label text-white">Total</label>
+        <input type="text" asp-for="Total" id="totalVenta" class="form-control bg-dark text-light border-secondary" readonly />
+        <div class="mt-2">
+            <button type="submit" class="btn btn-outline-success w-100">Generar Venta</button>
+        </div>
+    </div>
+
+    <input type="hidden" id="detallesJson" name="detallesJson" />
+</form>
+
+@section Scripts {
+    <script>
+        const productos = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(ViewBag.Productos));
+        let detalles = [];
+
+        function agregarProducto() {
+            detalles.push({
+                Id_Inventario: 0,
+                Cantidad: 1,
+                PrecioTotal: 0
+            });
+            renderTabla();
+        }
+
+        function renderTabla() {
+            const tbody = document.querySelector("#productosTabla tbody");
+            tbody.innerHTML = "";
+
+            let totalVenta = 0;
+
+            detalles.forEach((d, index) => {
+                const tr = document.createElement("tr");
+
+                const options = productos.map(p =>
+                    `<option value="${p.Id_Inventario}" ${p.Id_Inventario === d.Id_Inventario ? "selected" : ""}>${p.Nombre}</option>`
+                ).join("");
+
+                tr.innerHTML = `
+                    <td>
+                        <select class="form-select bg-dark text-light" data-index="${index}" data-tipo="producto">
+                            <option value="0">Seleccione producto</option>
+                            ${options}
+                        </select>
+                    </td>
+                    <td>
+                        <input type="number" min="1" value="${d.Cantidad}" class="form-control bg-dark text-light" data-index="${index}" data-tipo="cantidad"/>
+                    </td>
+                    <td>${d.Id_Inventario > 0 ? productos.find(p => p.Id_Inventario === d.Id_Inventario).Precio : 0}</td>
+                    <td>${d.PrecioTotal}</td>
+                    <td>
+                        <button type="button" class="btn btn-sm btn-danger" data-index="${index}">Eliminar</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+
+                totalVenta += d.PrecioTotal;
+            });
+
+            document.getElementById("totalVenta").value = totalVenta;
+            document.getElementById("detallesJson").value = JSON.stringify(detalles);
+
+            tbody.querySelectorAll("select[data-tipo='producto']").forEach(select => {
+                select.addEventListener("change", e => {
+                    const idx = e.target.getAttribute("data-index");
+                    const prodId = parseInt(e.target.value);
+                    detalles[idx].Id_Inventario = prodId;
+                    const prod = productos.find(p => p.Id_Inventario === prodId);
+                    detalles[idx].PrecioTotal = prod ? prod.Precio * detalles[idx].Cantidad : 0;
+                    renderTabla();
+                });
+            });
+
+            tbody.querySelectorAll("input[data-tipo='cantidad']").forEach(input => {
+                input.addEventListener("change", e => {
+                    const idx = e.target.getAttribute("data-index");
+                    const cantidad = parseInt(e.target.value) || 1;
+                    detalles[idx].Cantidad = cantidad;
+                    const prod = productos.find(p => p.Id_Inventario === detalles[idx].Id_Inventario);
+                    detalles[idx].PrecioTotal = prod ? prod.Precio * cantidad : 0;
+                    renderTabla();
+                });
+            });
+
+            tbody.querySelectorAll("button.btn-danger").forEach(btn => {
+                btn.addEventListener("click", e => {
+                    const idx = btn.getAttribute("data-index");
+                    detalles.splice(idx, 1);
+                    renderTabla();
+                });
+            });
+        }
+
+        document.getElementById("btnAgregarProducto").addEventListener("click", agregarProducto);
+        document.getElementById("formVenta").addEventListener("submit", () => {
+            document.getElementById("detallesJson").value = JSON.stringify(detalles);
+        });
+
+        renderTabla();
+    </script>
+}

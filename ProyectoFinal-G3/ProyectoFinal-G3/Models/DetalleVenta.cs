@@ -5,7 +5,7 @@
         public int Id_DetalleVenta { get; set; }
         public int Id_Venta { get; set; }
         public int Id_Inventario { get; set; }
-        public string ProductoNombre { get; set; } = string.Empty; 
+        public Inventario? Producto { get; set; } 
         public int Cantidad { get; set; }
         public decimal PrecioTotal { get; set; }
     }
