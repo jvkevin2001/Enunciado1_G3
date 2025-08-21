@@ -21,15 +21,17 @@ namespace ProyectoFinal_G3.Controllers
             using var http = _http.CreateClient();
             http.BaseAddress = new Uri(_configuration.GetSection("Start:ApiUrl").Value!);
 
+            
             var clientesResponse = http.GetFromJsonAsync<RespuestaEstandar<List<Cliente>>>("api/Clientes/ObtenerClientes").Result;
             ViewBag.Clientes = clientesResponse?.Contenido ?? new List<Cliente>();
 
-            var productosResponse = http.GetFromJsonAsync<RespuestaEstandar<List<Inventario>>>("api/Inventario/Listar").Result;
+            
+            var productosResponse = http.GetFromJsonAsync<List<Inventario>>("api/Inventario/Listar").Result;
             var productosJs = new List<dynamic>();
 
-            if (productosResponse?.Contenido != null)
+            if (productosResponse != null)
             {
-                productosJs = productosResponse.Contenido
+                productosJs = productosResponse
                     .Select(p => new
                     {
                         Id_Inventario = p.Id_Inventario,
@@ -44,6 +46,7 @@ namespace ProyectoFinal_G3.Controllers
 
             return View();
         }
+
 
         [HttpPost]
         public IActionResult CrearVenta(Venta venta, string detallesJson)
