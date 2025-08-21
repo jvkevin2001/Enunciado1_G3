@@ -35,17 +35,23 @@
 
         <!-- Menú de navegación derecha -->
         <ul class="navbar-nav ms-auto">
-            <!-- Enlace a Empleados -->
-            <li class="nav-item">
-                <a class="nav-link" asp-controller="Empleados" asp-action="Index">
-                    <i class="fas fa-users me-1"></i>
-                    <span class="d-none d-lg-inline">Empleados</span>
-                </a>
-            </li>
-            <!-- Nombre -->
-            <li class="nav-item">
-                <a class="nav-link" asp-controller="Empleados" asp-action="Index"> Nombre </a>
-            </li>
+            @using Microsoft.AspNetCore.Http
+
+            @{
+                var rol = Context.Session.GetString("IdRol"); // o HttpContext.Session.GetString("IdRol")
+            }
+
+            @if (rol == "2")
+            {
+                <li class="nav-item">
+                    <a class="nav-link" asp-controller="Empleados" asp-action="Index">
+                        <i class="fas fa-users me-1"></i>
+                        <span class="d-none d-lg-inline">Empleados</span>
+                    </a>
+                </li>
+            }
+
+
 
             <!-- Dropdown de Cuenta -->
             <li class="nav-item dropdown">
@@ -55,9 +61,10 @@
                     <span class="d-none d-lg-inline">Mi Cuenta</span>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                    <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i>Configuración</a></li>
                     <li><hr class="dropdown-divider" /></li>
-                    <li><a class="dropdown-item" asp-controller="Usuario" asp-action="Login"><i class="fas fa-user-plus me-2"></i>Iniciar Sesión</a></li>
+                    <a class="dropdown-item" asp-controller="Usuario" asp-action="CerrarSesion">
+                        <i class="fas fa-door-open me-2"></i> Cerrar Sesión
+                    </a>
                 </ul>
             </li>
         </ul>

@@ -107,5 +107,14 @@ namespace ProyectoFinal_G3.Controllers
                 }
             }
         }
+
+        [HttpGet]
+        public IActionResult CerrarSesion()
+        {
+            HttpContext.Session.Clear();
+            return RedirectToAction("Login", "Usuario");
+        }
+
+
     }
 }
