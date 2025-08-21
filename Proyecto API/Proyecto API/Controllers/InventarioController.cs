@@ -22,9 +22,7 @@ public class InventarioController : ControllerBase
         _util = util;
     }
 
-    /// <summary>
-    /// Endpoint para obtener la lista completa de productos del inventario.
-    /// </summary>
+ 
     [HttpGet]
     [Route("Listar")]
     public async Task<IActionResult> ListarProductos()
@@ -37,22 +35,17 @@ public class InventarioController : ControllerBase
                     "p_GetInventario",
                     commandType: CommandType.StoredProcedure
                 );
-                // ¡CAMBIO CLAVE AQUÍ!
-                // Devolvemos la lista de productos directamente.
                 return Ok(productos);
             }
         }
         catch (Exception ex)
         {
-            // En caso de error, sí puedes devolver el objeto de respuesta estándar
-            // para mantener consistencia en los errores.
+         
             return StatusCode(500, new { mensaje = $"Error interno: {ex.Message}" });
         }
     }
 
-    /// <summary>
-    /// Endpoint para obtener un producto por su ID.
-    /// </summary>
+
     [HttpGet]
     [Route("Obtener/{idInventario}")]
     public async Task<IActionResult> ObtenerProducto(int idInventario)
@@ -61,7 +54,6 @@ public class InventarioController : ControllerBase
         {
             using (var connection = new SqlConnection(_connectionString))
             {
-                // Llama a tu procedimiento 'p_GetInventarioById'
                 var producto = await connection.QueryFirstOrDefaultAsync<Inventario>(
                     "p_GetInventarioById",
                     new { Id_Inventario = idInventario },
@@ -81,9 +73,7 @@ public class InventarioController : ControllerBase
         }
     }
 
-    /// <summary>
-    /// Endpoint para registrar un nuevo producto en el inventario.
-    /// </summary>
+
     [HttpPost]
     [Route("Crear")]
     public async Task<IActionResult> CrearProducto([FromBody] Inventario nuevoProducto)
@@ -92,7 +82,6 @@ public class InventarioController : ControllerBase
         {
             using (var connection = new SqlConnection(_connectionString))
             {
-                // Llama a tu procedimiento 'p_InsertInventario'
                 await connection.ExecuteAsync(
                     "p_InsertInventario",
                     new
@@ -115,9 +104,6 @@ public class InventarioController : ControllerBase
         }
     }
 
-    /// <summary>
-    /// Endpoint para actualizar un producto existente.
-    /// </summary>
     [HttpPut]
     [Route("Actualizar/{idInventario}")]
     public async Task<IActionResult> ActualizarProducto(int idInventario, [FromBody] Inventario productoActualizado)
@@ -126,7 +112,6 @@ public class InventarioController : ControllerBase
         {
             using (var connection = new SqlConnection(_connectionString))
             {
-                // Llama a tu procedimiento 'p_UpdateInventario'
                 await connection.ExecuteAsync(
                     "p_UpdateInventario",
                     new
@@ -149,9 +134,6 @@ public class InventarioController : ControllerBase
         }
     }
 
-    /// <summary>
-    /// Endpoint para eliminar un producto del inventario.
-    /// </summary>
     [HttpDelete]
     [Route("Eliminar/{idInventario}")]
     public async Task<IActionResult> EliminarProducto(int idInventario)
@@ -160,7 +142,6 @@ public class InventarioController : ControllerBase
         {
             using (var connection = new SqlConnection(_connectionString))
             {
-                // Llama a tu procedimiento 'p_DeleteInventario'
                 await connection.ExecuteAsync(
                     "p_DeleteInventario",
                     new { Id_Inventario = idInventario },
@@ -171,7 +152,6 @@ public class InventarioController : ControllerBase
         }
         catch (Exception ex)
         {
-            // Capturamos el error de SQL en caso de que no se pueda borrar
             if (ex is SqlException sqlEx && sqlEx.Number == 50000)
             {
                 return BadRequest(sqlEx.Message);

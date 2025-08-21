@@ -63,10 +63,8 @@ namespace Proyecto_API.Controllers
                 if (existe > 0)
                 {
                     return Conflict(new { message = "Ya existe un usuario con este correo." });
-                    // 409 Conflict es el status más correcto
                 }
 
-                // Si no existe, procedemos a crearlo
                 var parametros = new
                 {
                     usuario.Nombre_Completo,
