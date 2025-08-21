@@ -1,10 +1,12 @@
 ﻿using Dapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Proyecto_API.Models;
 using Proyecto_API.Services;
 using System.Data;
+using System.Text;
 namespace Proyecto_API.Controllers
 
 {
@@ -14,11 +16,13 @@ namespace Proyecto_API.Controllers
     {
 
         private readonly IConfiguration _configuration;
+        private readonly IHostEnvironment _environment;
         private readonly IUtilitarios _utilitarios;
 
-        public UsuariosController(IConfiguration configuration, IUtilitarios utilitarios)
+        public UsuariosController(IConfiguration configuration, IHostEnvironment environment, IUtilitarios utilitarios)
         {
             _configuration = configuration;
+            _environment = environment;
             _utilitarios = utilitarios;
         }
 
@@ -115,8 +119,44 @@ namespace Proyecto_API.Controllers
             }
         }
 
+        [HttpPost]
+        [Route("RecuperarAcceso")]
+        public IActionResult RecuperarAcceso(Usuario Usuario)
+        {
+            using (var context = new SqlConnection(_configuration.GetSection("ConnectionStrings:Connection").Value))
+            {
+                var resultado = context.QueryFirstOrDefault<Usuario>("ValidarCorreo",
+                    new { Usuario.Correo });
+
+                if (resultado != null)
+                {
+                    var ContrasennaNotificar = _utilitarios.GenerarContrasenna(10);
+                    var Contrasenna = _utilitarios.Encrypt(ContrasennaNotificar);
+
+                    var resultadoActualizacion = context.Execute("ActualizarContrasenna",
+                        new
+                        {
+                            Id_Usuario = resultado.IdUsuario,  
+                            Contrasena = Contrasenna           
+                        });
 
 
+                    if (resultadoActualizacion > 0)
+                    {
+                        var ruta = Path.Combine(_environment.ContentRootPath, "Correos.html");
+                        var html = System.IO.File.ReadAllText(ruta, UTF8Encoding.UTF8);
+
+                        html = html.Replace("@@Usuario", resultado.Nombre_Completo);
+                        html = html.Replace("@@Contrasenna", ContrasennaNotificar);
+
+                        _utilitarios.EnviarCorreo(resultado.Correo!, "Recuperación de Acceso", html);
+                        return Ok(_utilitarios.RespuestaCorrecta(null));
+                    }
+                }
+
+                return BadRequest(_utilitarios.RespuestaIncorrecta("Su información no fue validada"));
+            }
+        }
 
 
 

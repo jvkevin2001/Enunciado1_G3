@@ -66,13 +66,15 @@ namespace Proyecto_API.Services
                 mensaje.Body = cuerpo;
                 mensaje.IsBodyHtml = true;
 
-                SmtpClient cliente = new SmtpClient("smtp.office365.com", 587);
+                // Cambiado a Gmail
+                SmtpClient cliente = new SmtpClient("smtp.gmail.com", 587);
                 cliente.Credentials = new NetworkCredential(correoSalida, claveCorreoSalida);
                 cliente.EnableSsl = true;
 
                 cliente.Send(mensaje);
             }
         }
+
 
         public string Encrypt(string texto)
         {

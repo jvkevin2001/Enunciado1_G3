@@ -116,6 +116,36 @@ namespace ProyectoFinal_G3.Controllers
             return RedirectToAction("Login", "Usuario");
         }
 
+        [HttpGet]
+        public IActionResult RecuperarAcceso()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> RecuperarAcceso(Usuario Usuario)
+        {
+            using var http = _http.CreateClient();
+            http.BaseAddress = new Uri(_configuration.GetSection("Start:ApiUrl").Value!);
+
+            // Envías solo el correo
+            var resultado = await http.PostAsJsonAsync("api/Usuarios/RecuperarAcceso", new { Usuario.Correo });
+
+            if (resultado.IsSuccessStatusCode)
+            {
+                ViewBag.Mensaje = "Se ha enviado un correo de recuperación.";
+                return RedirectToAction("Login", "Usuario");
+            }
+            else
+            {
+                // Evitamos leer JSON si no hay
+                ViewBag.Mensaje = "Ocurrió un error al enviar el correo.";
+                return View();
+            }
+        }
+
+
+
 
     }
 }
