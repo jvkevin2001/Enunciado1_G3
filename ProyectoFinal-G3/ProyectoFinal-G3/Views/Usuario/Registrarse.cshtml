@@ -65,7 +65,7 @@
     }
 
     .form-select {
-        background-color: var(--color-fondo); /* oscuro */
+        background-color: var(--color-fondo); 
         color: #eee;
         border: 1px solid #555;
     }
@@ -136,21 +136,20 @@
 <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
 <script>
         $('#btnRegistrar').click(function(e) {
-        e.preventDefault(); // evita que se envíe el form normalmente
+        e.preventDefault(); 
 
         var nombre = $('#Usuario_Nombre_Completo').val().trim();
         var correo = $('#Usuario_Correo').val().trim();
         var contrasena = $('#Usuario_Contrasenna').val().trim();
         var idRol = $('#Usuario_Id_Rol').val();
 
-        // Validación básica
         if (!nombre || !correo || !contrasena || !idRol) {
             Swal.fire({
                 icon: 'warning',
                 title: 'Campos vacíos',
                 text: 'Por favor complete todos los campos antes de registrarse.'
             });
-            return; // sale de la función y no hace AJAX
+            return; 
         }
 
         var usuarioData = {

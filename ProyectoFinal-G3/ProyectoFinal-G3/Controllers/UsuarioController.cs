@@ -49,7 +49,7 @@ namespace ProyectoFinal_G3.Controllers
                 }
 
                 ViewBag.Error = "Error al obtener los roles.";
-                return View(new UsuarioViewModel()); // Modelo vacío si falla
+                return View(new UsuarioViewModel()); 
             }
         }
 
@@ -130,7 +130,6 @@ namespace ProyectoFinal_G3.Controllers
             using var http = _http.CreateClient();
             http.BaseAddress = new Uri(_configuration.GetSection("Start:ApiUrl").Value!);
 
-            // Envías solo el correo
             var resultado = await http.PostAsJsonAsync("api/Usuarios/RecuperarAcceso", new { Usuario.Correo });
 
             if (resultado.IsSuccessStatusCode)
@@ -140,7 +139,6 @@ namespace ProyectoFinal_G3.Controllers
             }
             else
             {
-                // Evitamos leer JSON si no hay
                 ViewBag.Mensaje = "Ocurrió un error al enviar el correo.";
                 return View();
             }
