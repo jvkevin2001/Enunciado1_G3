@@ -1,0 +1,32 @@
+﻿@model List<Cliente>
+
+<h1 class="mt-4">Clientes</h1>
+<div class="card mb-4" style="margin-top:5%">
+    <div class="card-header">
+        <a class="btn btn-primary" href="@Url.Action("CrearCliente", "Clientes")">Registrar cliente</a>
+    </div>
+    <div class="card-body">
+        <table class="table table-bordered" style="color:rgba(224,224,224);">
+            <thead>
+                <tr>
+                    <th>Id Cliente</th>
+                    <th>Nombre</th>
+                    <th>Correo</th>
+                    <th>Telefono</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var cliente in Model)
+                {
+                    <tr>
+                        <td>@cliente.Id_Clientes</td>
+                        <td>@cliente.NombreCliente</td>
+                        <td>@cliente.Correo</td>
+                        <td>@cliente.Telefono</td>
+                      
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
